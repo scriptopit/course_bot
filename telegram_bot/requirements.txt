@@ -1,0 +1,9 @@
+aiocryptopay==0.2.7
+aiogram==2.25.1
+aiohttp==3.8.4
+aioschedule==0.5.2
+loguru==0.7.0
+pydantic==1.10.7
+python-dotenv==1.0.0
+Telethon==1.28.5
+uvicorn==0.22.0

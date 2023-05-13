@@ -1,6 +1,7 @@
 from pydantic import BaseSettings
 
 from loguru import logger
+from aiocryptopay import AioCryptoPay, Networks
 
 
 class Settings(BaseSettings):
@@ -10,6 +11,7 @@ class Settings(BaseSettings):
     ADMINS: list = [2113806246]
     TELEBOT_TOKEN: str
     DB_KEY_VALIDATION: str
+    CRYPTO_PAY_KEY: str
     LOCATION: str = 'SERVER'
 
 
@@ -25,12 +27,12 @@ class Database(BaseSettings):
 
 
 db = Database(
-    _env_file='../../.env',
+    _env_file='.env',
     _env_file_encoding='utf-8'
 )
 
-settings = Settings(_env_file='../../.env', _env_file_encoding='utf-8')
-
+settings = Settings(_env_file='.env', _env_file_encoding='utf-8')
+crypto = AioCryptoPay(token=settings.CRYPTO_PAY_KEY, network=Networks.TEST_NET)
 
 DATABASE_CONFIG = {
     "connections": {"default": db.get_db_name()},

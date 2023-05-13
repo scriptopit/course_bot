@@ -1,0 +1,60 @@
+version: '3.5'
+
+services:
+  postgres:
+    env_file:
+      - ./.env
+    container_name: postgres
+    image: postgres:14.4-alpine
+    command:
+      - "postgres"
+      - "-c"
+      - "log_destination=stderr"
+      - "-c"
+      - "logging_collector=on"
+      - "-c"
+      - "log_directory=/var/lib/postgresql/data/pg_log"
+      - "-c"
+      - "work_mem=16MB"
+      - "-c"
+      - "maintenance_work_mem=512MB"
+    restart: on-failure
+    volumes:
+      - ./postgres_db/postgres/postgresql-data:/var/lib/postgresql/data
+      - ./postgres_db/postgres/pginit/:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    ports:
+      - "5432:5432"
+
+  telegram_bot:
+    build: ./telegram_bot
+    container_name: bot
+    env_file:
+      - ./telegram_bot/.env
+    environment:
+      POSTGRES_HOST: postgres
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - postgres
+    restart: on-failure
+
+  cryptopay:
+    container_name: cryptopay
+    build: ./cryptopayments
+    command: >
+      sh -c "uvicorn main:app --workers 1 --host 0.0.0.0 --port 8000"
+    env_file:
+      - ./cryptopayments/.env
+    environment:
+      POSTGRES_HOST: postgres
+    ports:
+      - '8000:8000'
+    depends_on:
+      - postgres
+    restart: on-failure

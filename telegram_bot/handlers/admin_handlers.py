@@ -1,0 +1,1 @@
+from telegram_bot.config import bot, Dispatcher, settings

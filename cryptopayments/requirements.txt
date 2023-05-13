@@ -1,0 +1,8 @@
+aiocryptopay==0.2.7
+aiohttp==3.8.4
+fastapi==0.95.1
+loguru==0.7.0
+pydantic==1.10.7
+starlette==0.26.1
+tortoise-orm==0.19.3
+uvicorn==0.22.0
