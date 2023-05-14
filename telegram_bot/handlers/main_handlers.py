@@ -1,6 +1,8 @@
-from telegram_bot.config import bot, Dispatcher
+from config import bot, Dispatcher
 from aiogram.types import Message
-from telegram_bot.keyboards.keyboards import StartMenu
+from keyboards.keyboards import StartMenu
+from aiogram.dispatcher.filters import Text
+from messages.main_message import *
 
 
 async def main_menu(message: Message) -> None:
@@ -10,8 +12,21 @@ async def main_menu(message: Message) -> None:
     )
 
 
+async def buy_subscription(message: Message) -> None:
+    """ Хэндлер для покупки подписки """
+
+    for text in (sub_text, base_packet, pro_packet, vip_packet):
+        await message.answer(
+            text=text,
+            reply_markup=StartMenu.keyboard(),
+            parse_mode="Markdown"
+        )
+
+
 def register_main_handlers(dp: Dispatcher) -> None:
     """ Регистрирует MAIN хэндлеры приложения """
 
     dp.register_message_handler(
         main_menu, commands=["start"], state=None)
+    dp.register_message_handler(
+        buy_subscription, Text(equals=StartMenu.buy_subscription))

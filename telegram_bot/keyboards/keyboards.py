@@ -49,6 +49,25 @@ class StartMenu(BaseMenu):
         )
 
 
+@dataclass(frozen=True)
+class SubMenu(BaseMenu):
+    """ Меню для выбора подписок обучения """
+
+    base_packet: str = "Python BASE"
+    pro_packet: str = "Python PRO"
+    vip_packet: str = "Python VIP"
+
+    @classmethod
+    @logger.catch
+    def keyboard(cls) -> 'ReplyKeyboardMarkup':
+        """ Возвращает кнопки меню для выбора тарифа подписки """
+
+        return default_keyboard().add(
+            KeyboardButton(cls.base_packet),
+            KeyboardButton(cls.pro_packet),
+            KeyboardButton(cls.vip_packet)
+        )
+
 
 
 
