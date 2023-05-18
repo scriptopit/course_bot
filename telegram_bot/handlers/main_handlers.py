@@ -1,6 +1,6 @@
 from config import bot, Dispatcher
 from aiogram.types import Message
-from keyboards.keyboards import StartMenu
+from keyboards.keyboards import StartMenu, SubsMenu
 from aiogram.dispatcher.filters import Text
 from messages.main_message import *
 
@@ -18,9 +18,18 @@ async def buy_subscription(message: Message) -> None:
     for text in (sub_text, base_packet, pro_packet, vip_packet):
         await message.answer(
             text=text,
-            reply_markup=StartMenu.keyboard(),
+            reply_markup=SubsMenu.keyboard(),
             parse_mode="Markdown"
         )
+
+
+async def choose_sub_packet(message: Message) -> None:
+    """ Хэндлер на название тарифа для оплаты подписки """
+
+    await message.answer(
+        text=f"Вы выбрали тариф {message.text}",
+
+    )
 
 
 def register_main_handlers(dp: Dispatcher) -> None:

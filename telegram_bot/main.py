@@ -34,7 +34,7 @@ async def on_startup(_) -> None:
 
     logger.info(f'Bot started at: {datetime.datetime.now()}'
                 f'\nBOT POLLING ONLINE')
-    asyncio.create_task(check_base())
+    # asyncio.create_task(check_base())
 
 
 async def on_shutdown(dp) -> None:

@@ -1,12 +1,11 @@
 from dataclasses import dataclass
 from typing import Union
+from config import logger
 
 from aiogram.types import (
     ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup,
     InlineKeyboardButton
 )
-
-from config import logger
 
 
 def default_keyboard() -> ReplyKeyboardMarkup:
@@ -50,12 +49,12 @@ class StartMenu(BaseMenu):
 
 
 @dataclass(frozen=True)
-class SubMenu(BaseMenu):
+class SubsMenu(BaseMenu):
     """ Меню для выбора подписок обучения """
 
-    base_packet: str = "Python BASE"
-    pro_packet: str = "Python PRO"
-    vip_packet: str = "Python VIP"
+    base_packet: str = "🔩 Python BASE"
+    pro_packet: str = "💼 Python PRO"
+    vip_packet: str = "💎 Python VIP"
 
     @classmethod
     @logger.catch
