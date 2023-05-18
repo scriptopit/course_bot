@@ -52,8 +52,8 @@ class StartMenu(BaseMenu):
 class SubsMenu(BaseMenu):
     """ Меню для выбора подписок обучения """
 
-    base_packet: str = "🔩 Python BASE"
-    pro_packet: str = "💼 Python PRO"
+    base_packet: str = "🎩 Python BASE"
+    pro_packet: str = "🎓 Python PRO"
     vip_packet: str = "💎 Python VIP"
 
     @classmethod
