@@ -1,10 +1,6 @@
-from decimal import Decimal, getcontext
-
 from config import logger, BASE_API_URL
 from api.request_classes import PostRequest, GetRequest
 from api.utils import DataStructure
-
-getcontext().prec = 5
 
 
 class API:
@@ -71,7 +67,7 @@ class UserAPI(API):
     @classmethod
     @logger.catch
     async def get_user_status(
-            cls: 'UserAPI', telegram_id: int) -> dict:
+            cls: 'UserAPI', telegram_id: int) -> dict[str, int]:
         """Активировать пользователя"""
 
         endpoint: str = cls.__URL + '/get_user_status'
