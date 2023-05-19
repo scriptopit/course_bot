@@ -38,6 +38,7 @@ class RequestSender(ABC):
         try:
             async with aiohttp.ClientSession(**session_params) as session:
                 answer: dict = await self._send(session)
+
         except aiohttp.client_exceptions.ClientConnectorError as err:
             logger.error(f"aiohttp.client_exceptions.ClientConnectorError: {err}")
             answer.update(status=407, err=err)
@@ -61,7 +62,7 @@ class RequestSender(ABC):
             answer.update(status=-96, err=err)
         except aiohttp.client_exceptions.ContentTypeError as err:
             logger.error(f"aiohttp.client_exceptions.ContentTypeError: {err}")
-            answer.update(status=-9311, err=err)
+            answer.update(status=-95, err=err)
         except Exception as err:
             text = f"Exception: {err}"
             answer.update(status=-100, err=err)
@@ -112,6 +113,7 @@ class PostRequest(RequestSender):
         """ Отправляет POST запрос """
 
         self._payload.update(json=self._data_for_send)
+        print(self._payload)
         async with session.post(**self._payload) as response:
             return {
                 "status": response.status,

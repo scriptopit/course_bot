@@ -1,10 +1,9 @@
 from config import bot, Dispatcher
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from keyboards.keyboards import StartMenu, SubsMenu, PayButton
 from aiogram.dispatcher.filters import Text
 from states.states import SubscriptionState
 from aiogram.dispatcher.storage import FSMContext
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from classes.api_requests import UserAPI
 from messages.main_message import *
 
@@ -84,6 +83,31 @@ async def choose_sub_packet(message: Message, state: FSMContext) -> None:
         await state.finish()
 
 
+async def cancel_handler(message: Message, state: FSMContext) -> None:
+    current_state = await state.get_state()
+    await message.reply(
+        text=f"Успешная отмена",
+        reply_markup=StartMenu.keyboard()
+    )
+    if current_state is None:
+        return
+    await state.finish()
+
+
+async def callback_cancel(callback: CallbackQuery, state: FSMContext) -> None:
+    current_state = await state.get_state()
+    await callback.answer(
+        text=f"Успешная отмена",
+    )
+    await callback.message.answer(
+        text=f"Успешная отмена",
+        reply_markup=StartMenu.keyboard()
+    )
+    if current_state is None:
+        return
+    await state.finish()
+
+
 def register_main_handlers(dp: Dispatcher) -> None:
     """ Регистрирует MAIN хэндлеры приложения """
 
@@ -93,3 +117,7 @@ def register_main_handlers(dp: Dispatcher) -> None:
         buy_subscription, Text(equals=StartMenu.buy_subscription))
     dp.register_message_handler(
         choose_sub_packet, Text(contains="Python"), state=SubscriptionState.choose_sub_packet)
+    dp.register_callback_query_handler(
+        callback_cancel, state=["*"])
+    dp.register_message_handler(
+        cancel_handler, Text(equals="Отмена" or "отмена"), state=["*"])

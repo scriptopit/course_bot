@@ -7,7 +7,7 @@ class DataStructure(BaseModel):
     code: str = '000000'
     success: bool = False
     message: str = ''
-    data: Union[dict, list] = None
+    data: str = ''
 
     def as_dict(self) -> dict:
         return self.__dict__
