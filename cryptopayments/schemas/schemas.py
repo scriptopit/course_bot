@@ -16,6 +16,7 @@ class UserTelegramId(BaseModel):
 
 class SubscriptionUser(UserCreate):
     packet: str
+    price: int
 
 
 class AddChanel(BaseModel):

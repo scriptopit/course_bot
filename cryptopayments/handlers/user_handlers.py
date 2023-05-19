@@ -38,20 +38,17 @@ async def buy_subscription(subscription: SubscriptionUser, response: Response, r
     await check_token(request)
 
     result = DataStructure()
-    sub_price = await Packet.get_or_none(subscription=subscription.packet)
 
-    if sub_price:
-        invoice = await create_invoice(amount=sub_price.price)
-        await User.filter(telegram_id=subscription.telegram_id).update(
-            invoice_id=invoice.invoice_id)
+    invoice = await create_invoice(amount=subscription.price)
+    await User.filter(telegram_id=subscription.telegram_id).update(
+        invoice_id=invoice.invoice_id)
 
-        result.status = 200
-        result.success = True
-        result.data = invoice.pay_url
-        response.status_code = status.HTTP_200_OK
+    result.status = 200
+    result.success = True
+    result.data = invoice.pay_url
+    response.status_code = status.HTTP_200_OK
 
-        return result.as_dict()
-    raise exceptions.exception_not_found
+    return result.as_dict()
 
 
 @user_router.post("/check_payment", response_model=DataStructure, tags=['user'])

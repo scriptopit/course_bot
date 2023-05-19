@@ -44,19 +44,17 @@ async def choose_sub_packet(message: Message, state: FSMContext) -> None:
     if message.text == SubsMenu.base_packet:
 
         link = await UserAPI.buy_subscription(
-            packet="base",
-            telegram_id=message.from_user.id,
-            username=message.from_user.username)
-
-        await message.answer(
-            text=base_packet_price_menu,
-            parse_mode="Markdown",
-            reply_markup=InlineKeyboardMarkup(row_width=1).add(
-                InlineKeyboardButton(text=f"💵 Оплатить подписку", url="https://t.me/pybytes"))
-        )
-    elif message.text == SubsMenu.pro_packet:
-        await UserAPI.buy_subscription(
             packet="base", telegram_id=message.from_user.id, username=message.from_user.username)
+        if link:
+            await message.answer(
+                text=base_packet_price_menu,
+                parse_mode="Markdown",
+                reply_markup=InlineKeyboardMarkup(row_width=1).add(
+                    InlineKeyboardButton(text=f"💵 Оплатить подписку", url="https://t.me/pybytes"))
+            )
+    elif message.text == SubsMenu.pro_packet:
+        link = await UserAPI.buy_subscription(
+            packet="pro", telegram_id=message.from_user.id, username=message.from_user.username)
 
         await message.answer(
             text=pro_packet_price_menu,
@@ -65,8 +63,8 @@ async def choose_sub_packet(message: Message, state: FSMContext) -> None:
                 InlineKeyboardButton(text=f"💵 Оплатить подписку", url="https://t.me/pybytes"))
         )
     elif message.text == SubsMenu.vip_packet:
-        await UserAPI.buy_subscription(
-            packet="base", telegram_id=message.from_user.id, username=message.from_user.username)
+        link = await UserAPI.buy_subscription(
+            packet="vip", telegram_id=message.from_user.id, username=message.from_user.username)
 
         await message.answer(
             text=vip_packet_price_menu,
