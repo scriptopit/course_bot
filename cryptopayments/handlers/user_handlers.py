@@ -8,9 +8,7 @@ from services.utils import check_token, create_invoice, get_invoice_status
 from schemas.data_schemas import DataStructure
 from models.models import User, Statuses
 from services import exceptions
-
-from schemas.schemas import UserCreate, \
-    SubscriptionUser, UserTelegramId
+from schemas.schemas import UserCreate, SubscriptionUser, UserTelegramId
 
 user_router = APIRouter()
 
@@ -24,12 +22,12 @@ async def create_user(user: UserCreate, response: Response, request: Request):
     user_data = {
         'username': user.username,
         'telegram_id': user.telegram_id,
-        'expired_at': datetime.datetime.now()
     }
     await User.create(**user_data)
+
     result.status = 200
     result.success = True
-    result.data = {}
+    result.data = ""
     response.status_code = status.HTTP_201_CREATED
     return result.as_dict()
 
@@ -50,7 +48,6 @@ async def buy_subscription(subscription: SubscriptionUser, response: Response, r
     result.success = True
     result.data = invoice.pay_url
     response.status_code = status.HTTP_200_OK
-    loguru.logger.info(f"---------- {result.as_dict}")
     return result.as_dict()
 
 

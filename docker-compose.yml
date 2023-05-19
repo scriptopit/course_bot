@@ -47,10 +47,9 @@ services:
   cryptopayments:
     container_name: cryptopayments
     build: cryptopayments
-    command: >
-      sh -c "uvicorn main:app --workers 1 --host 0.0.0.0 --port 8000"
+    command: uvicorn main:app --host 0.0.0.0
     env_file:
-      - cryptopayments/.env
+      - ./.env
     environment:
       POSTGRES_HOST: postgres
     ports:

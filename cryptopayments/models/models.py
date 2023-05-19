@@ -36,7 +36,7 @@ class User(models.Model):
     telegram_id = fields.BigIntField(unique=True, description="Telegram id")
     username = fields.CharField(default="", max_length=50, description="Nickname name")
     created_at = fields.DatetimeField(auto_now_add=True, description="Create date")
-    updated_at = fields.DatetimeField(auto_now=True, description="Create date")
+    updated_at = fields.DatetimeField(auto_now=True, description="Update date")
     expired_at = fields.DatetimeField(auto_now_add=True, description="Expired date")
     description = fields.TextField(default="", max_length=1500, description="Description")
     status = fields.CharField(unique=True, default="enemy", max_length=100, description="Member status")
