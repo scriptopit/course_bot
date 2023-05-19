@@ -51,17 +51,18 @@ class UserAPI(API):
     @classmethod
     @logger.catch
     async def buy_subscription(
-            cls: 'UserAPI', packet: str, telegram_id: str, username: str) -> dict:
+            cls: 'UserAPI', packet: str, telegram_id: str, username: str, price: int) -> dict:
         """Купить подписку"""
 
         endpoint: str = cls.__URL + '/buy_subscription'
         data = {
             "packet": packet,
             "telegram_id": telegram_id,
-            "username": username
+            "username": username,
+            "price": price
         }
         result: 'DataStructure' = await cls._post_request(data=data, endpoint=endpoint)
-        logger.info(f"{result}")
+        logger.info(f"RES: {result}")
         return result.data if result.success else {}
 
     @classmethod

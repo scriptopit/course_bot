@@ -61,7 +61,7 @@ class RequestSender(ABC):
             answer.update(status=-96, err=err)
         except aiohttp.client_exceptions.ContentTypeError as err:
             logger.error(f"aiohttp.client_exceptions.ContentTypeError: {err}")
-            answer.update(status=-95, err=err)
+            answer.update(status=-9311, err=err)
         except Exception as err:
             text = f"Exception: {err}"
             answer.update(status=-100, err=err)
@@ -83,6 +83,7 @@ class RequestSender(ABC):
             answer: dict = await MessageReporter(answer=answer).handle_errors()
 
         data: dict = answer.get("answer_data")
+        logger.info(f"========= {data}")
         if data and isinstance(data, dict):
             if all((data.get("status"), data.get("code"))):
                 return DataStructure(**data)

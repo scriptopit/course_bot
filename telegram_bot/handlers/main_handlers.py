@@ -44,7 +44,9 @@ async def choose_sub_packet(message: Message, state: FSMContext) -> None:
     if message.text == SubsMenu.base_packet:
 
         link = await UserAPI.buy_subscription(
-            packet="base", telegram_id=message.from_user.id, username=message.from_user.username)
+            packet="base", telegram_id=message.from_user.id,
+            username=message.from_user.username, price=99)
+        print(link)
         if link:
             await message.answer(
                 text=base_packet_price_menu,
@@ -54,7 +56,8 @@ async def choose_sub_packet(message: Message, state: FSMContext) -> None:
 
     elif message.text == SubsMenu.pro_packet:
         link = await UserAPI.buy_subscription(
-            packet="pro", telegram_id=message.from_user.id, username=message.from_user.username)
+            packet="pro", telegram_id=message.from_user.id,
+            username=message.from_user.username, price=179)
 
         await message.answer(
             text=pro_packet_price_menu,
@@ -63,7 +66,8 @@ async def choose_sub_packet(message: Message, state: FSMContext) -> None:
         )
     elif message.text == SubsMenu.vip_packet:
         link = await UserAPI.buy_subscription(
-            packet="vip", telegram_id=message.from_user.id, username=message.from_user.username)
+            packet="vip", telegram_id=message.from_user.id,
+            username=message.from_user.username, price=269)
 
         await message.answer(
             text=vip_packet_price_menu,

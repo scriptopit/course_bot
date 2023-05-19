@@ -1,14 +1,15 @@
 import datetime
 
+import loguru
 from starlette import status
 from fastapi import APIRouter, Request, Response
 
-from cryptopayments.services.utils import check_token, create_invoice, get_invoice_status
-from cryptopayments.schemas.data_schemas import DataStructure
-from cryptopayments.models.models import User, Statuses
-from cryptopayments.services import exceptions
+from services.utils import check_token, create_invoice, get_invoice_status
+from schemas.data_schemas import DataStructure
+from models.models import User, Statuses
+from services import exceptions
 
-from cryptopayments.schemas.schemas import UserCreate, \
+from schemas.schemas import UserCreate, \
     SubscriptionUser, UserTelegramId
 
 user_router = APIRouter()
@@ -40,14 +41,16 @@ async def buy_subscription(subscription: SubscriptionUser, response: Response, r
     result = DataStructure()
 
     invoice = await create_invoice(amount=subscription.price)
-    await User.filter(telegram_id=subscription.telegram_id).update(
-        invoice_id=invoice.invoice_id)
+
+    # await User.filter(telegram_id=subscription.telegram_id).update(
+    #     invoice_id=invoice.invoice_id)
+    # print(invoice)
 
     result.status = 200
     result.success = True
     result.data = invoice.pay_url
     response.status_code = status.HTTP_200_OK
-
+    loguru.logger.info(f"---------- {result.as_dict}")
     return result.as_dict()
 
 

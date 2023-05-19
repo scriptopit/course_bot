@@ -1,4 +1,4 @@
-from cryptopayments.config import db
+from config import db
 from tortoise.contrib.fastapi import register_tortoise
 
 

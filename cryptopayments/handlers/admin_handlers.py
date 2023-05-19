@@ -1,11 +1,9 @@
 from fastapi import APIRouter, Request
 
-from cryptopayments.services.utils import check_token, \
-    create_invoice, get_invoice_status
-from cryptopayments.models.models import User, Packet, \
+from services.utils import check_token
+from models.models import User, \
     Statuses, Group
-from cryptopayments.schemas.schemas import UserCreate, \
-    SubscriptionUser, UserTelegramId, UserPydantic,\
+from schemas.schemas import UserTelegramId, UserPydantic,\
     AddChanel, AddPacket
 
 

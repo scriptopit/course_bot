@@ -45,10 +45,12 @@ services:
     restart: on-failure
 
   cryptopayments:
-    container_name: cryptopay
-    build: ./cryptopayments
+    container_name: cryptopayments
+    build: cryptopayments
+    command: >
+      sh -c "uvicorn main:app --workers 1 --host 0.0.0.0 --port 8000"
     env_file:
-      - ./cryptopayments/.env
+      - cryptopayments/.env
     environment:
       POSTGRES_HOST: postgres
     ports:
