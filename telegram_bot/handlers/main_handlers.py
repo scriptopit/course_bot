@@ -1,11 +1,11 @@
 from config import bot, Dispatcher
 from aiogram.types import Message
-from keyboards.keyboards import StartMenu, SubsMenu
+from keyboards.keyboards import StartMenu, SubsMenu, PayButton
 from aiogram.dispatcher.filters import Text
 from states.states import SubscriptionState
 from aiogram.dispatcher.storage import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from telegram_bot.classes.api_requests import UserAPI
+from classes.api_requests import UserAPI
 from messages.main_message import *
 
 
@@ -49,9 +49,9 @@ async def choose_sub_packet(message: Message, state: FSMContext) -> None:
             await message.answer(
                 text=base_packet_price_menu,
                 parse_mode="Markdown",
-                reply_markup=InlineKeyboardMarkup(row_width=1).add(
-                    InlineKeyboardButton(text=f"💵 Оплатить подписку", url="https://t.me/pybytes"))
+                reply_markup=PayButton.keyboard(url=link)
             )
+
     elif message.text == SubsMenu.pro_packet:
         link = await UserAPI.buy_subscription(
             packet="pro", telegram_id=message.from_user.id, username=message.from_user.username)
@@ -59,8 +59,7 @@ async def choose_sub_packet(message: Message, state: FSMContext) -> None:
         await message.answer(
             text=pro_packet_price_menu,
             parse_mode="Markdown",
-            reply_markup=InlineKeyboardMarkup(row_width=1).add(
-                InlineKeyboardButton(text=f"💵 Оплатить подписку", url="https://t.me/pybytes"))
+            reply_markup=PayButton.keyboard(url=link)
         )
     elif message.text == SubsMenu.vip_packet:
         link = await UserAPI.buy_subscription(
@@ -69,8 +68,7 @@ async def choose_sub_packet(message: Message, state: FSMContext) -> None:
         await message.answer(
             text=vip_packet_price_menu,
             parse_mode="Markdown",
-            reply_markup=InlineKeyboardMarkup(row_width=1).add(
-                InlineKeyboardButton(text=f"💵 Оплатить подписку", url="https://t.me/pybytes"))
+            reply_markup=PayButton.keyboard(url=link)
         )
     else:
         await message.answer(

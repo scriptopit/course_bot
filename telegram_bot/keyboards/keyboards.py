@@ -68,6 +68,18 @@ class SubsMenu(BaseMenu):
         )
 
 
+@dataclass(frozen=True)
+class PayButton:
+    """ Кнопка 'Оплатить подписку' для редиректа в бота Crypto Pay """
+
+    @classmethod
+    @logger.catch
+    def keyboard(cls, url: str) -> 'InlineKeyboardMarkup':
+        """ Возвращает кнопку с ссылкой в Crypto Pay Bot """
+
+        return InlineKeyboardMarkup(row_width=1).add(
+            InlineKeyboardButton(text=f"💵 Оплатить подписку", url=url)
+        )
 
 
 

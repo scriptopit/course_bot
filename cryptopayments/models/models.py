@@ -54,17 +54,17 @@ class User(models.Model):
         return self.username
 
 
-class Packet(models.Model):
-    id = fields.BigIntField(pk=True)
-    subscribe = fields.CharField(unique=True, max_length=100, default="", description="Sub packet")
-    price = fields.IntField(default=0, description="Price packet")
-    channel = fields.BigIntField(default=0, unique=True, description="Channel id for Sub")
-
-    class Meta:
-        table_description = "packets"
-
-    def __str__(self):
-        return self.subscribe
+# class Packet(models.Model):
+#     id = fields.BigIntField(pk=True)
+#     subscribe = fields.CharField(unique=True, max_length=100, default="", description="Sub packet")
+#     price = fields.IntField(default=0, description="Price packet")
+#     channel = fields.BigIntField(default=0, unique=True, description="Channel id for Sub")
+#
+#     class Meta:
+#         table_description = "packets"
+#
+#     def __str__(self):
+#         return self.subscribe
 
 
 class Group(models.Model):

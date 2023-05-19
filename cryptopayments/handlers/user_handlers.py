@@ -5,7 +5,7 @@ from fastapi import APIRouter, Request, Response
 
 from cryptopayments.services.utils import check_token, create_invoice, get_invoice_status
 from cryptopayments.schemas.data_schemas import DataStructure
-from cryptopayments.models.models import User, Packet, Statuses
+from cryptopayments.models.models import User, Statuses
 from cryptopayments.services import exceptions
 
 from cryptopayments.schemas.schemas import UserCreate, \
