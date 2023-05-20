@@ -12,7 +12,7 @@ def default_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         resize_keyboard=True,
         one_time_keyboard=True,
-        row_width=3
+        row_width=2
     )
 
 
@@ -22,7 +22,7 @@ class BaseMenu:
 
     @classmethod
     @logger.catch
-    def _keyboard(cls) -> Union[ReplyKeyboardMarkup, InlineKeyboardMarkup]:
+    def keyboard(cls) -> Union[ReplyKeyboardMarkup]:
         """ Возвращает кнопку Отмена """
 
         return default_keyboard().add(KeyboardButton(cls.cancel_key))
@@ -83,9 +83,63 @@ class PayButton:
         )
 
 
+@dataclass(frozen=True)
+class AdminButton(BaseMenu):
+    """ Кнопки главного админ-меню приложения """
+
+    add_channel = f"Добавить канал"
+    add_sub = f"Выдать подписку"
+    take_sub = f"Забрать подписку"
+    active_subs = f"Активные пользователи"
+    all_users = f"Все пользователи"
+
+    @classmethod
+    @logger.catch
+    def keyboard(cls) -> 'ReplyKeyboardMarkup':
+        """ Возвращает объект 'ReplyKeyboardMarkup' как админ-клавиатуру """
+
+        return default_keyboard().add(
+            KeyboardButton(text=cls.add_channel),
+            KeyboardButton(text=cls.add_sub),
+            KeyboardButton(text=cls.take_sub),
+            KeyboardButton(text=cls.active_subs),
+            KeyboardButton(text=cls.all_users)
+        )
 
 
+@dataclass(frozen=True)
+class YesOrNo(BaseMenu):
+    """ Кнопки 'Да' и 'Нет' """
+
+    yes_button = f"Да"
+    no_button = f"Нет"
+
+    @classmethod
+    @logger.catch
+    def keyboard(cls) -> Union[ReplyKeyboardMarkup]:
+        """ Возвращает объект 'ReplyKeyboardMarkup' с кнопками Да и Нет """
+
+        return default_keyboard().add(
+            KeyboardButton(text=cls.yes_button),
+            KeyboardButton(text=cls.no_button)
+        )
 
 
+@dataclass(frozen=True)
+class ChatTags(BaseMenu):
+    """ Тэги чата кнопками для администратора """
 
+    base_packet = "base"
+    pro_packet = "pro"
+    vip_packet = "vip"
 
+    @classmethod
+    @logger.catch
+    def keyboard(cls) -> Union[ReplyKeyboardMarkup]:
+        """ Возвращает кнопки с тэгами чата """
+
+        return default_keyboard().add(
+            KeyboardButton(text=cls.base_packet),
+            KeyboardButton(text=cls.pro_packet),
+            KeyboardButton(text=cls.vip_packet)
+        )

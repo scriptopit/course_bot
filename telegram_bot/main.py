@@ -9,9 +9,11 @@ from aiogram import executor
 from keyboards.keyboards import StartMenu
 from kicker.scheduler_funcs import check_base
 from handlers.main_handlers import register_main_handlers
+from handlers.admin_handlers import register_admin_handlers
 
 
 register_main_handlers(dp)
+register_admin_handlers(dp)
 
 
 async def on_startup(_) -> None:

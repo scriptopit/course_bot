@@ -65,20 +65,20 @@ async def add_channel(channel: AddChanel, request: Request) -> dict:
         return {"result": result}
 
 
-@admin_router.post("/add_packet", tags=['admin'])
-async def add_packet(packet: AddPacket, request: Request) -> dict:
-    await check_token(request)
-    check = await Packet.get_or_none(channel=packet.channel)
-
-    if not check:
-        packet_create: dict = {
-            "subscribe": packet.subscribe,
-            "channel": packet.channel,
-            "price": packet.price
-        }
-
-        result = await Packet.create(**packet_create)
-        return {"result": result}
+# @admin_router.post("/add_packet", tags=['admin'])
+# async def add_packet(packet: AddPacket, request: Request) -> dict:
+#     await check_token(request)
+#     check = await Packet.get_or_none(channel=packet.channel)
+#
+#     if not check:
+#         packet_create: dict = {
+#             "subscribe": packet.subscribe,
+#             "channel": packet.channel,
+#             "price": packet.price
+#         }
+#
+#         result = await Packet.create(**packet_create)
+#         return {"result": result}
 
 
 

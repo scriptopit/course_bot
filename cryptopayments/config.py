@@ -40,7 +40,7 @@ DATABASE_CONFIG = {
         "models": {
             "models": [
                 "aerich.models",
-                "models.models"
+                "cryptopayments.models.models"
             ],
             "default_connection": "default",
         },

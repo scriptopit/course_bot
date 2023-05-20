@@ -18,6 +18,7 @@ class API:
                        f'\nData: {data}')
         return await PostRequest(data=data, url=url).send_request()
 
+
     @classmethod
     @logger.catch
     async def _get_request(cls, endpoint: str) -> 'DataStructure':
@@ -122,7 +123,7 @@ class AdminAPI(API):
     @classmethod
     @logger.catch
     async def get_active_users(cls: 'AdminAPI') -> list[dict]:
-        """Получить список пользователей которые могут находиться в чате"""
+        """ Получить список пользователей которые могут находиться в чате """
 
         endpoint: str = cls.__URL + '/get_active_users'
         result: 'DataStructure' = await cls._get_request(endpoint=endpoint)
@@ -141,26 +142,12 @@ class AdminAPI(API):
     @logger.catch
     async def add_channel(
             cls: 'AdminAPI', channel_id: int, tag: str) -> 'DataStructure':
-        """Добавить канал"""
+        """ Добавить канал """
 
         endpoint: str = cls.__URL + '/add_channel'
         data = {
             "channel_id": channel_id,
             "tag": tag,
-        }
-        return await cls._post_request(data=data, endpoint=endpoint)
-
-    @classmethod
-    @logger.catch
-    async def add_packet(
-            cls: 'AdminAPI', subscribe: str, price: int, channel: int) -> 'DataStructure':
-        """ Добавляет новый тариф обучения """
-
-        endpoint: str = cls.__URL + '/add_packet'
-        data: dict = {
-            "subscribe": subscribe,
-            "price": price,
-            "channel": channel
         }
         return await cls._post_request(data=data, endpoint=endpoint)
 
