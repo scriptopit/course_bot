@@ -52,7 +52,7 @@ async def get_active_users(request: Request) -> list:
 
 
 @admin_router.post("/add_channel", tags=['admin'])
-async def add_channel(channel: AddChanel, request: Request) -> dict:
+async def add_channel(channel: AddChanel, request: Request) -> bool:
     await check_token(request)
     check = await Group.get_or_none(tag=channel.tag)
 
@@ -61,8 +61,9 @@ async def add_channel(channel: AddChanel, request: Request) -> dict:
             "tag": channel.tag,
             "channel_id": channel.channel_id
         }
-        result = await Group.create(**group_create)
-        return {"result": result}
+        await Group.create(**group_create)
+        return True
+    return False
 
 
 # @admin_router.post("/add_packet", tags=['admin'])

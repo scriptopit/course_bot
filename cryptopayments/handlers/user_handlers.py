@@ -40,9 +40,8 @@ async def buy_subscription(subscription: SubscriptionUser, response: Response, r
 
     invoice = await create_invoice(amount=subscription.price)
 
-    # await User.filter(telegram_id=subscription.telegram_id).update(
-    #     invoice_id=invoice.invoice_id)
-    # print(invoice)
+    await User.filter(telegram_id=subscription.telegram_id).update(
+        invoice_id=invoice.invoice_id)
 
     result.status = 200
     result.success = True
