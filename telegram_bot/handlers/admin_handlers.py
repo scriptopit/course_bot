@@ -131,7 +131,7 @@ async def info_user_filter(message: Message, state: FSMContext) -> None:
         await message.answer(
             reply_markup=ChatTags.keyboard(),
             text=f"Идентификатор пользователя {message.from_user.last_name}:"
-                 f" {message.from_user.id}."
+                 f" {message.from_user.id}.\n"
                  f"Теперь выберите пакет обучения который хотите ему выдать"
         )
         async with state.proxy() as data:
@@ -163,6 +163,44 @@ async def accumulate_data_and_send(message: Message, state: FSMContext) -> None:
     await state.finish()
 
 
+@admin_only
+async def deactivate_sub(message: Message):
+    """ Запрашивает информацию о пользователе для деактивации """
+
+    if not message.forward_from:
+        await bot.send_message(
+            chat_id=message.from_user.id,
+            text=f'Попросите пользователя в настройках '
+                 f'конфиденциальности изменить параметр '
+                 f'"Пересылка сообщений" на "Все", и попробуйте еще раз',
+            reply_markup=BaseMenu.keyboard()
+        )
+
+    else:
+        await message.answer(
+            reply_markup=AdminButton.keyboard(),
+            text=f"Идентификатор пользователя {message.from_user.last_name}:"
+                 f" {message.from_user.id}.\n"
+                 f"Сейчас он будет деактивирован!",
+        )
+
+        result = await AdminAPI.deactivate_user(telegram_id=message.from_user.id)
+        await message.answer(
+            text=result,
+            reply_markup=AdminButton.keyboard()
+        )
+
+
+async def get_active_users(message: Message) -> None:
+    """ Реагирует на кнопку 'Активные пользователи' """
+
+    result = await AdminAPI.get_active_users()
+    await message.answer(
+        text=f"Вот список активных пользователей вашего сервиса:\n"
+             f"{result}",
+    )
+
+
 def register_admin_handlers(dp: Dispatcher) -> None:
     """ Регистрирует админ-хэндлеры приложения """
 
@@ -183,5 +221,9 @@ def register_admin_handlers(dp: Dispatcher) -> None:
     dp.register_message_handler(
         info_user_filter, state=AdminState.get_user_info)
     dp.register_message_handler(
-        )
+        accumulate_data_and_send, state=AdminState.choose_tag_user)
+    dp.register_message_handler(
+        deactivate_sub, Text(equals=AdminButton.take_sub), state=None)
+    dp.register_message_handler(
+        get_active_users, Text(equals=AdminButton.active_subs))
 
