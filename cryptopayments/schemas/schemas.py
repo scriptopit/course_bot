@@ -30,4 +30,8 @@ class AddPacket(BaseModel):
     channel: int
 
 
+class UserActivityChange(UserTelegramId):
+    tag: str
+
+
 UserPydantic = pydantic_model_creator(User, exclude=('invoice_id',))

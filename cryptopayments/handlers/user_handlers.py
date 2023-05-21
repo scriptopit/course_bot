@@ -73,7 +73,3 @@ async def check_payment(user: UserTelegramId, response: Response, request: Reque
     result.status = 402
     result.success = True
     return result
-
-
-
-

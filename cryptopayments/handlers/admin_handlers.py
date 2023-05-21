@@ -1,10 +1,12 @@
+import datetime
+
 from fastapi import APIRouter, Request
 
 from services.utils import check_token
 from models.models import User, \
     Statuses, Group
 from schemas.schemas import UserTelegramId, UserPydantic,\
-    AddChanel, AddPacket
+    AddChanel, AddPacket, UserActivityChange
 
 
 admin_router = APIRouter()
@@ -36,10 +38,12 @@ async def deactivate_user(data: UserTelegramId, request: Request) -> dict:
 
 
 @admin_router.post("/activate_user", tags=['admin'])
-async def deactivate_user(data: UserTelegramId, request: Request) -> dict:
+async def activate_user(data: UserActivityChange, request: Request) -> dict:
     await check_token(request)
     result = await User.filter(telegram_id=data.telegram_id).update(
-        status=Statuses.member
+        tag=data.tag,
+        status=Statuses.member,
+        expired_at=datetime.datetime.now().replace(microsecond=0)
     )
     return {"result": result}
 
@@ -64,25 +68,3 @@ async def add_channel(channel: AddChanel, request: Request) -> bool:
         await Group.create(**group_create)
         return True
     return False
-
-
-# @admin_router.post("/add_packet", tags=['admin'])
-# async def add_packet(packet: AddPacket, request: Request) -> dict:
-#     await check_token(request)
-#     check = await Packet.get_or_none(channel=packet.channel)
-#
-#     if not check:
-#         packet_create: dict = {
-#             "subscribe": packet.subscribe,
-#             "channel": packet.channel,
-#             "price": packet.price
-#         }
-#
-#         result = await Packet.create(**packet_create)
-#         return {"result": result}
-
-
-
-
-
-

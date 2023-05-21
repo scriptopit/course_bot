@@ -38,7 +38,7 @@ class User(models.Model):
     created_at = fields.DatetimeField(auto_now_add=True, description="Create date")
     updated_at = fields.DatetimeField(auto_now=True, description="Update date")
     expired_at = fields.DatetimeField(auto_now_add=True, description="Expired date")
-    description = fields.TextField(default="", max_length=1500, description="Description")
+    tag = fields.TextField(default="", max_length=50, description="Tag packet")
     status = fields.CharField(unique=True, default="enemy", max_length=100, description="Member status")
     invoice_id = fields.BigIntField(default="0", unique=True, description="Invoice id Crypto bot")
 
@@ -52,19 +52,6 @@ class User(models.Model):
 
     def __str__(self):
         return self.username
-
-
-# class Packet(models.Model):
-#     id = fields.BigIntField(pk=True)
-#     subscribe = fields.CharField(unique=True, max_length=100, default="", description="Sub packet")
-#     price = fields.IntField(default=0, description="Price packet")
-#     channel = fields.BigIntField(default=0, unique=True, description="Channel id for Sub")
-#
-#     class Meta:
-#         table_description = "packets"
-#
-#     def __str__(self):
-#         return self.subscribe
 
 
 class Group(models.Model):

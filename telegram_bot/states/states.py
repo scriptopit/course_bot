@@ -10,3 +10,5 @@ class AdminState(StatesGroup):
     processing = State()
     receive_tag = State()
     check_data = State()
+    get_user_info = State()
+    choose_tag_user = State()

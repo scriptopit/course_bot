@@ -1,6 +1,7 @@
 from config import logger, BASE_API_URL
 from api.request_classes import PostRequest, GetRequest
 from api.utils import DataStructure
+from typing import Union
 
 
 class API:
@@ -98,19 +99,20 @@ class AdminAPI(API):
     @classmethod
     @logger.catch
     async def activate_user(
-            cls: 'AdminAPI', telegram_id: int) -> dict:
+            cls: 'AdminAPI', telegram_id: int, tag: str) -> Union[dict, str]:
         """Активировать пользователя"""
 
         endpoint: str = cls.__URL + '/activate_user'
         data = {
             "telegram_id": telegram_id,
+            "tag": tag
         }
         result: 'DataStructure' = await cls._post_request(data=data, endpoint=endpoint)
         return result.data if result.success else {}
 
     @classmethod
     @logger.catch
-    async def deactivate_user(cls: 'AdminAPI', telegram_id: int) -> dict:
+    async def deactivate_user(cls: 'AdminAPI', telegram_id: int) -> Union[dict, str]:
         """ Деактивировать пользователя """
 
         endpoint: str = cls.__URL + "/deactivate_user"
