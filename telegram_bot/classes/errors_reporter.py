@@ -53,28 +53,21 @@ class MessageReporter:
         """Sending error messages"""
 
         text: str = ''
-        if self._status == 0:
-            text: str = f"Ошибка {self._status}"
-        elif self._status < 0:
-            text: str = f"Ошибка {self._status}"
-        elif self._status == -100:
-            text: str = f"Ошибка {self._status}"
-        elif self._status == 400:
-            text: str = f"Ошибка {self._status}"
-        elif self._status == 401:
-            text: str = f"Ошибка {self._status}"
-        elif self._status == 403:
-            text: str = f"Ошибка {self._status}"
-        elif self._status == 404:
-            text: str = f"Ошибка {self._status}"
-        elif self._status == 407:
-            text: str = f"Ошибка {self._status}"
-        elif self._status == 500:
-            text: str = f"Ошибка {self._status}"
-        elif self._status == 504:
-            text: str = f"Ошибка {self._status}"
-        else:
-            text = f'Unrecognised error! {self._status} {self._code}'
+        error_messages = {
+            0: f"Ошибка {self._status}",
+            -100: f"Ошибка {self._status}",
+            400: f"Ошибка {self._status}",
+            401: f"Ошибка {self._status}",
+            403: f"Ошибка {self._status}",
+            404: f"Ошибка {self._status}",
+            407: f"Ошибка {self._status}",
+            500: f"Ошибка {self._status}",
+            504: f"Ошибка {self._status}"
+        }
+
+        text = error_messages.get(self._status, f"Unrecognised error! {self._status} {self._code}")
+        text = text.format(status=self._status)
+
         if text:
             if self._telegram_id:
                 text += f"\nTelegram_ID: {self._telegram_id}"
@@ -82,7 +75,8 @@ class MessageReporter:
                 await self.send_message_to_user(text=text)
             if admins:
                 await self.send_report_to_admins(text)
-        error_message: str = (
+
+        error_message = (
             f"ErrorsSender get error:"
             f"\n\tTelegram_id: {self._telegram_id}"
             f"\n\tError status: {self._status}"
