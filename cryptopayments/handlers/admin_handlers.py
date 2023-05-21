@@ -32,7 +32,9 @@ async def get_user_status(data: UserTelegramId, request: Request) -> dict:
 async def deactivate_user(data: UserTelegramId, request: Request) -> dict:
     await check_token(request)
     result = await User.filter(telegram_id=data.telegram_id).update(
-        status=Statuses.dead_enemy
+        status=Statuses.dead_enemy,
+        expired_at=datetime.datetime.now().replace(microsecond=0) + datetime.timedelta(minutes=5),
+        tag=""
     )
     return {"result": result}
 

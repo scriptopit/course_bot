@@ -172,4 +172,6 @@ def register_admin_handlers(dp: Dispatcher) -> None:
         user_free_sub, Text(equals=AdminButton.add_sub), state=None)
     dp.register_message_handler(
         info_user_filter, state=AdminState.get_user_info)
+    dp.register_message_handler(
+        )
 
