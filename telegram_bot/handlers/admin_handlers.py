@@ -6,8 +6,10 @@ from config import bot, Dispatcher
 from keyboards.keyboards import AdminButton, BaseMenu, YesOrNo, ChatTags
 from states.states import AdminState
 from classes.api_requests import AdminAPI
+from decorators.decorators import admin_only
 
 
+@admin_only
 async def admin_menu(message: Message) -> None:
     """ Главное меню админ-панели """
 
@@ -17,6 +19,7 @@ async def admin_menu(message: Message) -> None:
     )
 
 
+@admin_only
 async def add_channel(message: Message) -> None:
     """ Хэндлер на добавление нового канала в базу данных """
 
@@ -27,6 +30,7 @@ async def add_channel(message: Message) -> None:
     )
 
 
+@admin_only
 async def get_channel_data(message: Message, state: FSMContext) -> None:
     """ Получает про канал информацию и отправляет в базу данных """
 
@@ -43,6 +47,7 @@ async def get_channel_data(message: Message, state: FSMContext) -> None:
     )
 
 
+@admin_only
 async def response_processing(message: Message, state: FSMContext) -> None:
     """ Проверяет ответ пользователя и выполняет определенные события """
 
@@ -61,6 +66,7 @@ async def response_processing(message: Message, state: FSMContext) -> None:
         await state.finish()
 
 
+@admin_only
 async def insert_chat_tag(message: Message, state: FSMContext) -> None:
     """ Получает от пользователя введенный тэг который будет являться названием канала """
 
@@ -78,6 +84,7 @@ async def insert_chat_tag(message: Message, state: FSMContext) -> None:
         await AdminState.check_data.set()
 
 
+@admin_only
 async def validate_data(message: Message, state: FSMContext) -> None:
     """ Получает подтверждение или отказ от пользователя и выполняет запрос """
 
@@ -96,6 +103,7 @@ async def validate_data(message: Message, state: FSMContext) -> None:
         await state.finish()
 
 
+@admin_only
 async def user_free_sub(message: Message) -> None:
     """ Добавляет пользователя в базу данных мимо кассы """
 
@@ -106,6 +114,7 @@ async def user_free_sub(message: Message) -> None:
     await AdminState.get_user_info.set()
 
 
+@admin_only
 async def info_user_filter(message: Message, state: FSMContext) -> None:
     """ Получает ID пользователя и добавляет его в базу данных """
 
@@ -132,6 +141,7 @@ async def info_user_filter(message: Message, state: FSMContext) -> None:
         await AdminState.choose_tag_user.set()
 
 
+@admin_only
 async def accumulate_data_and_send(message: Message, state: FSMContext) -> None:
     """ Собирает данные для выдачи бесплатной подписки и добавляет пользователя в БД """
 
