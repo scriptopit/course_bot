@@ -37,7 +37,6 @@ async def buy_subscription(subscription: SubscriptionUser, response: Response, r
     await check_token(request)
 
     result = DataStructure()
-
     invoice = await create_invoice(amount=subscription.price)
 
     await User.filter(telegram_id=subscription.telegram_id).update(
@@ -45,7 +44,7 @@ async def buy_subscription(subscription: SubscriptionUser, response: Response, r
 
     result.status = 200
     result.success = True
-    result.data = invoice.pay_url
+    result.message = invoice.pay_url
     response.status_code = status.HTTP_200_OK
     return result.as_dict()
 

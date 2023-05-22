@@ -50,7 +50,7 @@ async def activate_user(data: UserActivityChange, request: Request) -> dict:
     return {"result": result}
 
 
-@admin_router.post("/get_active_users", response_model=list[UserTelegramId], tags=['admin'])
+@admin_router.get("/get_active_users", response_model=list[UserTelegramId], tags=['admin'])
 async def get_active_users(request: Request) -> list:
     await check_token(request)
 

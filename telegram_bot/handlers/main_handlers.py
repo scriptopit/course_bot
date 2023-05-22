@@ -18,7 +18,7 @@ async def main_menu(message: Message) -> None:
     )
 
 
-async def buy_subscription(message: Message, state: FSMContext) -> None:
+async def buy_subscription_packet(message: Message, state: FSMContext) -> None:
     """ Хэндлер для покупки подписки """
 
     async with state.proxy() as data:
@@ -44,8 +44,8 @@ async def choose_sub_packet(message: Message, state: FSMContext) -> None:
 
         link = await UserAPI.buy_subscription(
             packet="base", telegram_id=message.from_user.id,
-            username=message.from_user.username, price=99)
-        print(link)
+            username=message.from_user.username, price=1)
+
         if link:
             await message.answer(
                 text=base_packet_price_menu,
@@ -114,7 +114,7 @@ def register_main_handlers(dp: Dispatcher) -> None:
     dp.register_message_handler(
         main_menu, commands=["start"], state=None)
     dp.register_message_handler(
-        buy_subscription, Text(equals=StartMenu.buy_subscription))
+        buy_subscription_packet, Text(equals=StartMenu.buy_subscription))
     dp.register_message_handler(
         choose_sub_packet, Text(contains="Python"), state=SubscriptionState.choose_sub_packet)
     dp.register_callback_query_handler(

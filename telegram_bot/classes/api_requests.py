@@ -64,8 +64,8 @@ class UserAPI(API):
             "price": price
         }
         result: 'DataStructure' = await cls._post_request(data=data, endpoint=endpoint)
-        logger.info(f"RES: {result}")
-        return result.data if result.success else {}
+
+        return result.message if result.success else {}
 
     @classmethod
     @logger.catch

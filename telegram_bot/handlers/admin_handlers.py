@@ -191,10 +191,11 @@ async def deactivate_sub(message: Message):
         )
 
 
-async def get_active_users(message: Message) -> None:
+async def get_active_users_handler(message: Message) -> None:
     """ Реагирует на кнопку 'Активные пользователи' """
 
     result = await AdminAPI.get_active_users()
+    print(f"[TEST TEST TEST]: {result}")
     await message.answer(
         text=f"Вот список активных пользователей вашего сервиса:\n"
              f"{result}",
@@ -225,5 +226,5 @@ def register_admin_handlers(dp: Dispatcher) -> None:
     dp.register_message_handler(
         deactivate_sub, Text(equals=AdminButton.take_sub), state=None)
     dp.register_message_handler(
-        get_active_users, Text(equals=AdminButton.active_subs))
+        get_active_users_handler, Text(equals=AdminButton.active_subs))
 
