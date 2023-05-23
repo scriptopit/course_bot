@@ -79,6 +79,7 @@ class PayButton:
 
         return InlineKeyboardMarkup(row_width=1).add(
             InlineKeyboardButton(text=f"💵 Оплатить подписку", url=url),
+            InlineKeyboardButton(text=f"⏳ Проверить оплату", callback_data="check_payment"),
             InlineKeyboardButton(text=f"Отмена", callback_data="cancel")
         )
 
