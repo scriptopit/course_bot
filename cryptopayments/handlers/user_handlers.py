@@ -78,7 +78,7 @@ async def check_payment(user: UserTelegramId, response: Response, request: Reque
 
 
 @user_router.post("/get_id_channel", response_model=DataStructure, tags=['user'])
-async def get_id_channel(data: GetChannelId, response: Response, request: Request):
+async def get_id_channel(data: GetChannelId, request: Request):
     await check_token(request)
     result = DataStructure()
 
@@ -87,7 +87,7 @@ async def get_id_channel(data: GetChannelId, response: Response, request: Reques
     if chat_id:
         result.status = 200
         result.success = True
-        result.message = str(chat_id)
+        result.message = str(chat_id.channel_id)
         return result.as_dict()
 
     result.status = 400

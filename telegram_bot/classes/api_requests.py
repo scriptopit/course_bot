@@ -77,6 +77,7 @@ class UserAPI(API):
         data = {
             "telegram_id": telegram_id,
         }
+
         result: 'DataStructure' = await cls._post_request(data=data, endpoint=endpoint)
         return result.data
 
@@ -91,7 +92,7 @@ class UserAPI(API):
         }
 
         result: 'DataStructure' = await cls._post_request(data=data, endpoint=endpoint)
-        return result.message
+        return result
 
     @classmethod
     @logger.catch
