@@ -40,3 +40,8 @@ WrongBuildException = HTTPException(
     status_code=status.HTTP_406_NOT_ACCEPTABLE,
     detail='Wrong build'
 )
+
+ChannelExistsException = HTTPException(
+    status_code=status.HTTP_409_CONFLICT,
+    detail='Channel exists'
+)

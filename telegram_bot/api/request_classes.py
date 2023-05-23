@@ -4,7 +4,7 @@ import aiohttp.client_exceptions
 import aiohttp.http_exceptions
 
 from config import DB_KEY_VALIDATION
-from api.utils import DataStructure
+from api.utils import DataStructure, UserModel
 from classes.errors_reporter import MessageReporter
 from abc import abstractmethod, ABC
 from config import logger
@@ -74,7 +74,8 @@ class RequestSender(ABC):
         if status == 204:
             return DataStructure(status=status, data={}, message="No content")
         elif status in range(400, 500):
-            return DataStructure(status=status, data={}, message=f"Error {status}")
+            return DataStructure(
+                status=status, data=answer.get("answer_data"), message=f"Error {status}")
         elif status not in range(200, 300):
             error_text: str = (
                 f"\nStatus: {status}"
@@ -84,10 +85,12 @@ class RequestSender(ABC):
             answer: dict = await MessageReporter(answer=answer).handle_errors()
 
         data: dict = answer.get("answer_data")
-        logger.info(f"========= {data}")
         if data and isinstance(data, dict):
             if all((data.get("status"), data.get("code"))):
                 return DataStructure(**data)
+
+        if data and isinstance(data, list):
+            return [UserModel(**item) for item in data]
 
         return DataStructure(status=status, data=data)
 

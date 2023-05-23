@@ -91,16 +91,30 @@ async def validate_data(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
 
     if message.text == YesOrNo.yes_button:
-        await AdminAPI.add_channel(
+        response = await AdminAPI.add_channel(
             channel_id=data['channel_id'],
             tag=data['tag']
         )
+
+        if response.status == 409:
+            text: str = "Канал уже добавлен в какой то из тарифов.\n" \
+                           "Открепите его для начала"
+        elif response.status == 200:
+            text: str = f"Канал {data['channel_id']} успешно добавлен в тариф {data['tag'].upper()}"
+        else:
+            text = response
+
+        await message.answer(
+            text=text,
+            reply_markup=AdminButton.keyboard()
+        )
+
     else:
         await message.answer(
             text=f"Тогда попробуйте заново",
             reply_markup=AdminButton.keyboard()
         )
-        await state.finish()
+    await state.finish()
 
 
 @check_super_admin
@@ -196,10 +210,20 @@ async def get_active_users_handler(message: Message) -> None:
     """ Реагирует на кнопку 'Активные пользователи' """
 
     result = await AdminAPI.get_active_users()
-    print(f"[TEST TEST TEST]: {result}")
     await message.answer(
         text=f"Вот список активных пользователей вашего сервиса:\n"
              f"{result}",
+    )
+
+
+@check_super_admin
+async def get_service_users(message: Message) -> None:
+    """ Реагирует на кнопку 'Все пользователи' """
+
+    result = await AdminAPI.get_all_users()
+    await message.answer(
+        text=f"Вот список всех пользователей вашего сервиса:\n"
+             f"{result}"
     )
 
 
@@ -228,4 +252,6 @@ def register_admin_handlers(dp: Dispatcher) -> None:
         deactivate_sub, Text(equals=AdminButton.take_sub), state=None)
     dp.register_message_handler(
         get_active_users_handler, Text(equals=AdminButton.active_subs))
+    dp.register_message_handler(
+        get_service_users, Text(equals=AdminButton.all_users))
 

@@ -7,12 +7,14 @@ from models.models import User, \
     Statuses, Group
 from schemas.schemas import UserTelegramId, UserPydantic,\
     AddChanel, AddPacket, UserActivityChange
+from typing import Any
+from services import exceptions
 
 
 admin_router = APIRouter()
 
 
-@admin_router.get("/get_users", response_model=list[UserPydantic], tags=['admin'])
+@admin_router.get("/get_user_list", response_model=list[UserPydantic], tags=['admin'])
 async def get_user_list(request: Request) -> list:
     await check_token(request)
 
@@ -54,19 +56,21 @@ async def activate_user(data: UserActivityChange, request: Request) -> dict:
 async def get_active_users(request: Request) -> list:
     await check_token(request)
 
-    return await User.filter(status=Statuses.member).values("telegram_id")
+    return await User.filter(status=Statuses.member)
 
 
 @admin_router.post("/add_channel", tags=['admin'])
-async def add_channel(channel: AddChanel, request: Request) -> bool:
+async def add_channel(channel: AddChanel, request: Request) -> dict[str, Any]:
     await check_token(request)
-    check = await Group.get_or_none(tag=channel.tag)
+    check = await Group.get_or_none(channel_id=channel.channel_id)
 
     if not check:
         group_create: dict = {
             "tag": channel.tag,
             "channel_id": channel.channel_id
         }
-        await Group.create(**group_create)
-        return True
-    return False
+        response = await Group.create(**group_create)
+        return response
+    else:
+        raise exceptions.ChannelExistsException
+

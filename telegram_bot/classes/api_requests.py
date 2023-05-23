@@ -138,7 +138,8 @@ class AdminAPI(API):
 
         endpoint: str = cls.__URL + '/get_user_list'
         result: 'DataStructure' = await cls._get_request(endpoint=endpoint)
-        return result.data
+        logger.info(f"RECEIVED: {result}")
+        # return result.data
 
     @classmethod
     @logger.catch
