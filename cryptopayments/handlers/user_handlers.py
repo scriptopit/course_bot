@@ -7,9 +7,10 @@ from fastapi import APIRouter, Request, Response
 
 from services.utils import check_token, create_invoice, get_invoice_status
 from schemas.data_schemas import DataStructure
-from models.models import User, Statuses
+from models.models import User, Statuses, Group
 from services import exceptions
-from schemas.schemas import UserCreate, SubscriptionUser, UserTelegramId
+from schemas.schemas import UserCreate,\
+    SubscriptionUser, UserTelegramId, GetChannelId
 
 user_router = APIRouter()
 
@@ -56,7 +57,7 @@ async def check_payment(user: UserTelegramId, response: Response, request: Reque
 
     result = DataStructure()
     invoice_id = await User.get_or_none(telegram_id=user.telegram_id)
-    print("INVOICE STATUS", invoice_id)
+    loguru.logger.info(f"INVOICE STATUS: {invoice_id} . {user.telegram_id}")
     if invoice_id:
         check = await get_invoice_status(invoice_id=invoice_id.invoice_id)
         if check:
@@ -74,3 +75,24 @@ async def check_payment(user: UserTelegramId, response: Response, request: Reque
     result.status = 402
     result.success = True
     return result
+
+
+@user_router.post("/get_id_channel", response_model=DataStructure, tags=['user'])
+async def get_id_channel(data: GetChannelId, response: Response, request: Request):
+    await check_token(request)
+    result = DataStructure()
+
+    chat_id = await Group.get_or_none(tag=data.tag)
+
+    if chat_id:
+        result.status = 200
+        result.success = True
+        result.message = str(chat_id)
+        return result.as_dict()
+
+    result.status = 400
+    result.success = True
+    return result.as_dict()
+
+
+

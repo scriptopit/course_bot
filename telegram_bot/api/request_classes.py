@@ -3,11 +3,10 @@ import aiohttp
 import aiohttp.client_exceptions
 import aiohttp.http_exceptions
 
-from config import DB_KEY_VALIDATION
+from config import DB_KEY_VALIDATION, logger
 from api.utils import DataStructure, UserModel
 from classes.errors_reporter import MessageReporter
 from abc import abstractmethod, ABC
-from config import logger
 
 
 class RequestSender(ABC):
@@ -116,7 +115,7 @@ class PostRequest(RequestSender):
         """ Отправляет POST запрос """
 
         self._payload.update(json=self._data_for_send)
-        print(self._payload)
+
         async with session.post(**self._payload) as response:
             return {
                 "status": response.status,

@@ -144,3 +144,19 @@ class ChatTags(BaseMenu):
             KeyboardButton(text=cls.pro_packet),
             KeyboardButton(text=cls.vip_packet)
         )
+
+
+@dataclass(frozen=True)
+class UrlButton:
+    """ Возвращает кнопку-ссылку """
+
+    join_group = "🎁 Вступить в чат"
+
+    @classmethod
+    @logger.catch
+    def keyboard(cls, url: str) -> Union[InlineKeyboardMarkup]:
+        """ Возвращает кнопку-ссылку"""
+
+        return InlineKeyboardMarkup(row_width=2).add(
+            InlineKeyboardButton(text=cls.join_group, url=url)
+        )

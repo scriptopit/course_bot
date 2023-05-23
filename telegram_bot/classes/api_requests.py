@@ -82,12 +82,27 @@ class UserAPI(API):
 
     @classmethod
     @logger.catch
+    async def get_id_channel(cls: 'UserAPI', tag: str) -> dict[str, int]:
+        """ Возвращаешь ID канала по его тэгу """
+
+        endpoint: str = cls.__URL + '/get_id_channel'
+        data: dict = {
+            "tag": tag
+        }
+
+        result: 'DataStructure' = await cls._post_request(data=data, endpoint=endpoint)
+        return result.message
+
+    @classmethod
+    @logger.catch
     async def check_payment(
             cls: 'UserAPI', telegram_id: int) -> 'DataStructure':
+
         endpoint: str = cls.__URL + '/check_payment'
         data: dict = {
             "telegram_id": telegram_id
         }
+
         return await cls._post_request(data=data, endpoint=endpoint)
 
 
@@ -127,6 +142,7 @@ class AdminAPI(API):
     async def get_active_users(cls: 'AdminAPI') -> list[dict]:
         """ Получить список пользователей которые могут находиться в чате """
 
+        # TODO: Need to test
         endpoint: str = cls.__URL + '/get_active_users'
         result: 'DataStructure' = await cls._get_request(endpoint=endpoint)
         return result.data
@@ -138,8 +154,8 @@ class AdminAPI(API):
 
         endpoint: str = cls.__URL + '/get_user_list'
         result: 'DataStructure' = await cls._get_request(endpoint=endpoint)
-        logger.info(f"RECEIVED: {result}")
-        # return result.data
+
+        return result.data
 
     @classmethod
     @logger.catch

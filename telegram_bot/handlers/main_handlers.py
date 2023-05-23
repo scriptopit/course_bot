@@ -1,9 +1,10 @@
+import datetime
 import time
 import loguru
 
 from config import bot, Dispatcher
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
-from keyboards.keyboards import StartMenu, SubsMenu, PayButton
+from keyboards.keyboards import StartMenu, SubsMenu, PayButton, UrlButton
 from aiogram.dispatcher.filters import Text
 from states.states import SubscriptionState
 from aiogram.dispatcher.storage import FSMContext
@@ -43,13 +44,15 @@ async def choose_sub_packet(message: Message, state: FSMContext) -> None:
 
     async with state.proxy() as data:
         data["packet"] = message.text
+        data["telegram_id"] = message.from_user.id
 
     if message.text == SubsMenu.base_packet:
 
         link = await UserAPI.buy_subscription(
             packet="base", telegram_id=message.from_user.id,
             username=message.from_user.username, price=1)
-        await write_to_storage(state=state, url=link, packet=base_packet_price_menu)
+        await write_to_storage(
+            state=state, url=link, packet=base_packet_price_menu, tag="base")
 
         if link:
             await message.answer(
@@ -62,7 +65,8 @@ async def choose_sub_packet(message: Message, state: FSMContext) -> None:
         link = await UserAPI.buy_subscription(
             packet="pro", telegram_id=message.from_user.id,
             username=message.from_user.username, price=179)
-        await write_to_storage(state=state, url=link, packet=pro_packet_price_menu)
+        await write_to_storage(
+            state=state, url=link, packet=pro_packet_price_menu, tag="pro")
 
         await message.answer(
             text=pro_packet_price_menu,
@@ -73,7 +77,8 @@ async def choose_sub_packet(message: Message, state: FSMContext) -> None:
         link = await UserAPI.buy_subscription(
             packet="vip", telegram_id=message.from_user.id,
             username=message.from_user.username, price=269)
-        await write_to_storage(state=state, url=link, packet=vip_packet_price_menu)
+        await write_to_storage(
+            state=state, url=link, packet=vip_packet_price_menu, tag="vip")
 
         await message.answer(
             text=vip_packet_price_menu,
@@ -94,12 +99,13 @@ async def payment_callback(callback: CallbackQuery, state: FSMContext) -> None:
     """ Ловит callback check_payment и отвечает на него """
 
     if callback.data == "check_payment":
-        loguru.logger.info(f"{callback.message.reply_markup.inline_keyboard}")
+
         await callback.message.delete()
         message_data: Message = await callback.message.answer(
             "⌛ Получаю информацию по статусу вашего инвойса...",
             reply_markup=ReplyKeyboardRemove())
-        telegram_id: int = int(callback.message.from_user.id)
+        telegram_id: int = int(callback.from_user.id)
+        loguru.logger.info(f"Во время проверки: {telegram_id}")
         subscribe_data: dict = await UserAPI.check_payment(telegram_id=telegram_id)
         if not subscribe_data:
             await callback.message.answer(
@@ -110,34 +116,30 @@ async def payment_callback(callback: CallbackQuery, state: FSMContext) -> None:
 
         data = await state.get_data()
         await message_data.delete()
-        await callback.message.answer(
-            text=data["packet"],
-            reply_markup=PayButton.keyboard(url=data['url'])
-        )
 
-        loguru.logger.info(f"link :::: {data['url']}")
+        if subscribe_data.get("status", 0) != 200:
+            await callback.message.answer(
+                text=data["packet"],
+                reply_markup=PayButton.keyboard(url=data['url']),
+                parse_mode="Markdown"
+            )
+        else:
+            chat_id: str = await UserAPI.get_id_channel(tag=data['tag'])
+            # TODO: Присмотреться к обработке Not Found в базе данных. иногда возвращаю 400 ответ
 
+            url = await bot.create_chat_invite_link(
+                chat_id=chat_id,
+                # creates_join_request=True,
+                expire_date=datetime.datetime.now().replace(
+                    microsecond=0) + datetime.timedelta(hours=12),
+                member_limit=1
+            )
 
-        # link: str = await get_link(telegram_id)
-        # await message.answer(
-        #     f"Вы получили приглашение в приватный канал. \n📩 Нажмите кнопку ниже для вступления."
-        #     f"\n{link}",
-        #     reply_markup=StartMenu.keyboard()
-        # )
-        # await state.finish()
-        # return
-
-        # )
-        # await message.answer(f"\n{address}")
-        # await message.answer(
-        #     "Нажмите 'Проверить платеж' после оплаты или 'Отмена' чтобы отменить операцию.",
-        #     reply_markup=YesNo.keyboard(
-        #         yes_key="Проверить платеж",
-        #         prefix="check_payment",
-        #         suffix=f"{price_str}"
-        #     )
-        # )
-        # await state.finish()
+            await callback.message.answer(
+                text=f"🎁 Вы успешно приобрели подписку, "
+                     f"вот ваша личная ссылка для подключения к каналу с ментором.\n",
+                reply_markup=UrlButton.keyboard(url=url.invite_link)
+            )
 
     await callback.answer()
 
@@ -145,9 +147,7 @@ async def payment_callback(callback: CallbackQuery, state: FSMContext) -> None:
 async def cancel_handler(message: Message, state: FSMContext) -> None:
     current_state = await state.get_state()
     await message.reply(
-        text=f"Успешная отмена",
-        reply_markup=StartMenu.keyboard()
-    )
+        text=f"Успешная отмена", reply_markup=StartMenu.keyboard())
     if current_state is None:
         return
     await state.finish()

@@ -40,7 +40,7 @@ class User(models.Model):
     expired_at = fields.DatetimeField(auto_now_add=True, description="Expired date")
     tag = fields.TextField(default="", max_length=50, description="Tag packet")
     status = fields.CharField(default="enemy", max_length=100, description="Member status")
-    invoice_id = fields.BigIntField(default="0", description="Invoice id Crypto bot")
+    invoice_id = fields.BigIntField(default=0, description="Invoice id Crypto bot")
 
     class PydanticMeta:
         table_description = "users"

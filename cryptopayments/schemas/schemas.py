@@ -34,4 +34,8 @@ class UserActivityChange(UserTelegramId):
     tag: str
 
 
+class GetChannelId(BaseModel):
+    tag: str
+
+
 UserPydantic = pydantic_model_creator(User, exclude=('invoice_id',))
