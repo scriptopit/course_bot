@@ -18,13 +18,12 @@ def get_application() -> FastAPI:
         logger.error(f"Attribute error: {err}")
     except Exception as err:
         logger.error(f"Migration error: {err}")
+    application = FastAPI()
+    db_connect(application)
     send_message_to_admins(f"{__appname__} started."
                            f"\nBuild: [{__build__}]"
                            f"\nVersion: [{__version__}]"
-                           f"\nLocation: [{settings.LOCATION}]"
-    )
-    application = FastAPI()
-    db_connect(application)
+                           f"\nLocation: [{settings.LOCATION}]")
     application.include_router(api_router)
 
     return application

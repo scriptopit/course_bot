@@ -1,14 +1,20 @@
-from aiogram import types
+from aiogram.types import Message
 from config import logger, settings
-from typing import Union, Callable, Awaitable, Optional
+from typing import Callable, Any
+from functools import wraps
 
 
-def admin_only(func: Callable[..., Awaitable[None]]) -> Optional[Callable[..., Awaitable[None]]]:
-    async def wrapper(message: types.Message) -> None:
+@logger.catch
+def check_super_admin(func: Callable) -> Callable:
+    """decorator for handler check user on super admin"""
 
-        if message.from_user.id in settings.ADMINS:
-            await func(message)
-        else:
-            logger.error("Access denied for non-admin user: %s", message.from_user.id)
+    @wraps(func)
+    async def wrapper(*args, **kwargs) -> Any:
+        message: Message = args[0]
+        telegram_id: int = message.from_user.id
+        if telegram_id in settings.ADMINS:
+            logger.debug(f"{func.__qualname__} User {message.from_user.id} is superadmin.")
+            return await func(*args, **kwargs)
+        logger.debug(f"{func.__qualname__} User {message.from_user.id} is not superadmin.")
 
     return wrapper
