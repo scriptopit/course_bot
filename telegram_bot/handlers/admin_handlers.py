@@ -144,13 +144,13 @@ async def info_user_filter(message: Message, state: FSMContext) -> None:
     else:
         await message.answer(
             reply_markup=ChatTags.keyboard(),
-            text=f"Идентификатор пользователя {message.from_user.last_name}:"
-                 f" {message.from_user.id}.\n"
+            text=f"Идентификатор пользователя {message.forward_from.first_name}:"
+                 f" {message.forward_from.id}.\n"
                  f"Теперь выберите пакет обучения который хотите ему выдать"
         )
         async with state.proxy() as data:
-            data['user_id'] = message.from_user.id
-            data['username'] = message.from_user.username
+            data['user_id'] = message.forward_from.id
+            data['username'] = message.forward_from.username
 
         await AdminState.choose_tag_user.set()
 

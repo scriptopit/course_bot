@@ -57,13 +57,15 @@ async def check_payment(user: UserTelegramId, response: Response, request: Reque
 
     result = DataStructure()
     invoice_id = await User.get_or_none(telegram_id=user.telegram_id)
-    loguru.logger.info(f"INVOICE STATUS: {invoice_id} . {user.telegram_id}")
+
     if invoice_id:
         check = await get_invoice_status(invoice_id=invoice_id.invoice_id)
         if check:
             await User.filter(telegram_id=user.telegram_id).update(
                 status=Statuses.member,
-                expired_at=datetime.datetime.utcnow()
+                expired_at=datetime.datetime.utcnow().replace(
+                    microsecond=0) + datetime.timedelta(days=30),
+                tag=user.tag
             )
 
             result.status = 200
