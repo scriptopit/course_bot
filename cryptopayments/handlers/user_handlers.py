@@ -67,6 +67,7 @@ async def check_payment(user: UserTelegramId, response: Response, request: Reque
                     microsecond=0) + datetime.timedelta(days=30),
                 tag=user.tag
             )
+            loguru.logger.info(f"{await User.get_or_none(telegram_id=user.telegram_id)}")
 
             result.status = 200
             result.success = True

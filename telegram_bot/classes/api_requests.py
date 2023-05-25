@@ -1,3 +1,4 @@
+import loguru
 from config import logger, BASE_API_URL
 from api.request_classes import PostRequest, GetRequest
 from api.utils import DataStructure
@@ -123,8 +124,9 @@ class AdminAPI(API):
             "telegram_id": telegram_id,
             "tag": tag
         }
+
         result: 'DataStructure' = await cls._post_request(data=data, endpoint=endpoint)
-        return result.data if result.success else {}
+        return result.data
 
     @classmethod
     @logger.catch

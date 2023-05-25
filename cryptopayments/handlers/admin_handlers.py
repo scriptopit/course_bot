@@ -1,5 +1,6 @@
 import datetime
 
+import loguru
 from fastapi import APIRouter, Request
 
 from services.utils import check_token
@@ -44,12 +45,16 @@ async def deactivate_user(data: UserTelegramId, request: Request) -> dict:
 @admin_router.post("/activate_user", tags=['admin'])
 async def activate_user(data: UserActivityChange, request: Request) -> dict:
     await check_token(request)
-    result = await User.filter(telegram_id=data.telegram_id).update(
+
+    response = await User.filter(telegram_id=data.telegram_id).update(
         tag=data.tag,
         status=Statuses.member,
         expired_at=datetime.datetime.now().replace(microsecond=0)
     )
-    return {"result": result}
+
+    if response:
+        return {"status": 200}
+    return {"status": 400}
 
 
 @admin_router.get("/get_active_users", response_model=list[UserTelegramId], tags=['admin'])

@@ -1,11 +1,14 @@
+import loguru
+import datetime
+
 from config import bot, Dispatcher, settings
 from aiogram.dispatcher.storage import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import Message, CallbackQuery
 from config import bot, Dispatcher
-from keyboards.keyboards import AdminButton, BaseMenu, YesOrNo, ChatTags
+from keyboards.keyboards import AdminButton, BaseMenu, YesOrNo, ChatTags, UrlButton
 from states.states import AdminState
-from classes.api_requests import AdminAPI
+from classes.api_requests import AdminAPI, UserAPI
 from decorators.decorators import check_super_admin
 
 
@@ -165,8 +168,31 @@ async def accumulate_data_and_send(message: Message, state: FSMContext) -> None:
                  f"Записываю в базу данных нового ученика",
             reply_markup=AdminButton.keyboard()
         )
+
         data = await state.get_data()
-        await AdminAPI.activate_user(telegram_id=data['telegram_id'], tag=message.text)
+        response = await AdminAPI.activate_user(telegram_id=data['user_id'], tag=message.text)
+
+        if response["status"] == 200:
+            chat_id = await UserAPI.get_id_channel(tag=message.text)
+            url = await bot.create_chat_invite_link(
+                chat_id=chat_id.message,
+                expire_date=datetime.datetime.now().replace(
+                    microsecond=0) + datetime.timedelta(hours=12),
+                member_limit=1
+            )
+
+            await bot.send_message(
+                text=f"🎁 Вам выдали доступ к тарифу {message.text}\n"
+                     f"Желаем приятного обучения!",
+                chat_id=data['user_id'],
+                reply_markup=UrlButton.keyboard(url=url)
+            )
+
+        else:
+            await message.answer(
+                text=f"Пользователя нет в базе данных, он должен прописать /start",
+                reply_markup=AdminButton.keyboard()
+            )
 
     else:
         await message.answer(
