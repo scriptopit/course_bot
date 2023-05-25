@@ -12,6 +12,7 @@ from classes.api_requests import UserAPI
 from utils.utils import write_to_storage
 from api.utils import DataStructure
 from messages.main_message import *
+from aiogram.utils.callback_data import CallbackData
 
 
 async def main_menu(message: Message) -> None:
@@ -143,6 +144,15 @@ async def payment_callback(callback: CallbackQuery, state: FSMContext) -> None:
             )
             await state.finish()
 
+    elif callback.data == "cancel":
+
+        await state.finish()
+        await callback.message.delete()
+        await callback.message.answer(
+            text=f"Успешная отмена",
+            reply_markup=StartMenu.keyboard()
+        )
+
     await callback.answer()
 
 
@@ -156,17 +166,18 @@ async def cancel_handler(message: Message, state: FSMContext) -> None:
 
 
 async def callback_cancel(callback: CallbackQuery, state: FSMContext) -> None:
+    """ Отвечает на CALLBACK кнопки CANCEL """
+
     current_state = await state.get_state()
-    await callback.answer(
-        text=f"Успешная отмена",
-    )
+    if current_state is not None:
+        await state.finish()
+
     await callback.message.answer(
         text=f"Успешная отмена",
         reply_markup=StartMenu.keyboard()
     )
-    if current_state is None:
-        return
-    await state.finish()
+
+    await callback.answer()
 
 
 def register_main_handlers(dp: Dispatcher) -> None:
@@ -180,7 +191,6 @@ def register_main_handlers(dp: Dispatcher) -> None:
         choose_sub_packet, Text(contains="Python"), state=SubscriptionState.choose_sub_packet)
     dp.register_callback_query_handler(
         payment_callback, state=SubscriptionState.choose_sub_packet)
-    dp.register_callback_query_handler(
-        callback_cancel, state=["*"])
     dp.register_message_handler(
         cancel_handler, Text(equals="Отмена" or "отмена"), state=["*"])
+
