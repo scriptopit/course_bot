@@ -1,7 +1,7 @@
 import loguru
 from config import logger, BASE_API_URL
 from api.request_classes import PostRequest, GetRequest
-from api.utils import DataStructure
+from api.utils_schemas import DataStructure
 from typing import Union
 
 

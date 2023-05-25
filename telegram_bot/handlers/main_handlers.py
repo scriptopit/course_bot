@@ -9,8 +9,8 @@ from aiogram.dispatcher.filters import Text
 from states.states import SubscriptionState
 from aiogram.dispatcher.storage import FSMContext
 from classes.api_requests import UserAPI
-from utils.utils import write_to_storage
-from api.utils import DataStructure
+from utils.utils import write_to_storage, developer_photo
+from api.utils_schemas import DataStructure
 from messages.main_message import *
 from aiogram.utils.callback_data import CallbackData
 
@@ -181,6 +181,21 @@ async def callback_cancel(callback: CallbackQuery, state: FSMContext) -> None:
     await callback.answer()
 
 
+async def info_about(message: Message) -> None:
+    """ Возвращает информацию про администрацию ментор-сервиса """
+
+    await bot.send_photo(
+        photo=await developer_photo(),
+        caption='📇 Instagram: [iTDeal Group](https://www.instagram.com/itdealgroup/)'
+                '\n👨‍💻 Telegram Channel: [Pythonic Bytes](t.me/pybytes)'
+                '\n👨‍💻 Telegram Chat: [PyBytes Chat](t.me/pybytes_chat)'
+                '\n👨‍💻 Telegram: [A B BOT ](t.me/lunasantrope)',
+        chat_id=message.from_user.id,
+        parse_mode='Markdown',
+        reply_markup=StartMenu.keyboard()
+    )
+
+
 def register_main_handlers(dp: Dispatcher) -> None:
     """ Регистрирует MAIN хэндлеры приложения """
 
@@ -192,6 +207,8 @@ def register_main_handlers(dp: Dispatcher) -> None:
         choose_sub_packet, Text(contains="Python"), state=SubscriptionState.choose_sub_packet)
     dp.register_callback_query_handler(
         payment_callback, state=SubscriptionState.choose_sub_packet)
+    dp.register_message_handler(
+        info_about, Text(equals=StartMenu.information), state=None)
     dp.register_message_handler(
         cancel_handler, Text(equals="Отмена" or "отмена"), state=["*"])
 

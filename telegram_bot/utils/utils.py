@@ -40,3 +40,10 @@ async def collect_data_and_send(data: list, message: Message) -> None:
             text=text,
             reply_markup=AdminButton.keyboard()
         )
+
+
+async def developer_photo():
+    """ Open a photo for menu 'about developer' and return """
+
+    photo = open('img/img.png', 'rb')
+    return photo

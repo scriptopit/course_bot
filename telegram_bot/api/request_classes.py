@@ -4,7 +4,7 @@ import aiohttp.client_exceptions
 import aiohttp.http_exceptions
 
 from config import DB_KEY_VALIDATION, logger
-from api.utils import DataStructure, UserModel
+from api.utils_schemas import DataStructure, UserModel
 from classes.errors_reporter import MessageReporter
 from abc import abstractmethod, ABC
 
