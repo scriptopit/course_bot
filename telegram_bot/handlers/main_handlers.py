@@ -47,6 +47,7 @@ async def choose_sub_packet(message: Message, state: FSMContext) -> None:
     async with state.proxy() as data:
         data["packet"] = message.text
         data["telegram_id"] = message.from_user.id
+        data["tag"] = message.text.split(" ")[-1].lower()
 
     if message.text == SubsMenu.base_packet:
 
@@ -103,12 +104,15 @@ async def payment_callback(callback: CallbackQuery, state: FSMContext) -> None:
     if callback.data == "check_payment":
 
         await callback.message.delete()
+        data = await state.get_data()
         message_data: Message = await callback.message.answer(
             "⌛ Получаю информацию по статусу вашего инвойса...",
             reply_markup=ReplyKeyboardRemove())
         telegram_id: int = int(callback.from_user.id)
         loguru.logger.info(f"Во время проверки: {telegram_id}")
-        subscribe_data: DataStructure = await UserAPI.check_payment(telegram_id=telegram_id)
+        subscribe_data: DataStructure = await UserAPI.check_payment(
+            telegram_id=telegram_id, tag=data["tag"])
+
         if not subscribe_data:
             await callback.message.answer(
                 "Ошибка запроса к базе данных при получении информации для подписки.",
@@ -116,7 +120,6 @@ async def payment_callback(callback: CallbackQuery, state: FSMContext) -> None:
             await state.finish()
             return
 
-        data = await state.get_data()
         await message_data.delete()
 
         if subscribe_data.status != 200:
@@ -127,11 +130,9 @@ async def payment_callback(callback: CallbackQuery, state: FSMContext) -> None:
             )
         else:
             chat_id = await UserAPI.get_id_channel(tag=data['tag'])
-            # TODO: Присмотреться к обработке Not Found в базе данных. иногда возвращаю 400 ответ
 
             url = await bot.create_chat_invite_link(
                 chat_id=chat_id.message,
-                # creates_join_request=True,
                 expire_date=datetime.datetime.now().replace(
                     microsecond=0) + datetime.timedelta(hours=12),
                 member_limit=1

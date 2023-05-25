@@ -10,7 +10,7 @@ from schemas.data_schemas import DataStructure
 from models.models import User, Statuses, Group
 from services import exceptions
 from schemas.schemas import UserCreate,\
-    SubscriptionUser, UserTelegramId, GetChannelId
+    SubscriptionUser, UserTelegramId, GetChannelId, UserActivityChange
 
 user_router = APIRouter()
 
@@ -52,7 +52,7 @@ async def buy_subscription(subscription: SubscriptionUser, response: Response, r
 
 
 @user_router.post("/check_payment", response_model=DataStructure, tags=['user'])
-async def check_payment(user: UserTelegramId, response: Response, request: Request):
+async def check_payment(user: UserActivityChange, response: Response, request: Request):
     await check_token(request)
 
     result = DataStructure()

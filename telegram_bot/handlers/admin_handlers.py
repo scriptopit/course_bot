@@ -8,6 +8,7 @@ from aiogram.types import Message, CallbackQuery
 from states.states import AdminState
 from classes.api_requests import AdminAPI, UserAPI
 from decorators.decorators import check_super_admin
+from utils.utils import collect_data_and_send
 from keyboards.keyboards import AdminButton, BaseMenu, \
     YesOrNo, ChatTags, UrlButton, StartMenu
 
@@ -256,10 +257,7 @@ async def get_active_users_handler(message: Message) -> None:
     """ Реагирует на кнопку 'Активные пользователи' """
 
     result = await AdminAPI.get_active_users()
-    await message.answer(
-        text=f"Вот список активных пользователей вашего сервиса:\n"
-             f"{result}",
-    )
+    await collect_data_and_send(data=result, message=message)
 
 
 @check_super_admin
@@ -267,10 +265,7 @@ async def get_service_users(message: Message) -> None:
     """ Реагирует на кнопку 'Все пользователи' """
 
     result = await AdminAPI.get_all_users()
-    await message.answer(
-        text=f"Вот список всех пользователей вашего сервиса:\n"
-             f"{result}"
-    )
+    await collect_data_and_send(message=message, data=result)
 
 
 def register_admin_handlers(dp: Dispatcher) -> None:

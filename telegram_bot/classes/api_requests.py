@@ -72,7 +72,6 @@ class UserAPI(API):
     @logger.catch
     async def get_user_status(
             cls: 'UserAPI', telegram_id: int) -> dict[str, int]:
-        """Активировать пользователя"""
 
         endpoint: str = cls.__URL + '/get_user_status'
         data = {
@@ -98,11 +97,12 @@ class UserAPI(API):
     @classmethod
     @logger.catch
     async def check_payment(
-            cls: 'UserAPI', telegram_id: int) -> 'DataStructure':
+            cls: 'UserAPI', telegram_id: int, tag: str) -> 'DataStructure':
 
         endpoint: str = cls.__URL + '/check_payment'
         data: dict = {
-            "telegram_id": telegram_id
+            "telegram_id": telegram_id,
+            "tag": tag
         }
 
         return await cls._post_request(data=data, endpoint=endpoint)

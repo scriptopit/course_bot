@@ -19,7 +19,7 @@ admin_router = APIRouter()
 @admin_router.get("/get_user_list", response_model=list[UserPydantic], tags=['admin'])
 async def get_user_list(request: Request) -> list:
     await check_token(request)
-    print(type(await User.all()))
+
     return await User.all()
 
 
@@ -70,9 +70,9 @@ async def get_active_users(request: Request) -> list:
     filtered = await User.filter(status=Statuses.member)
 
     for item in filtered:
-        item.expired_at = str(item.expired_at)
-        item.updated_at = str(item.updated_at)
-        item.created_at = str(item.created_at)
+        item.expired_at = item.expired_at.strftime('%Y-%m-%dT%H:%M:%S%z')
+        item.updated_at = item.updated_at.strftime('%Y-%m-%dT%H:%M:%S%z')
+        item.created_at = item.created_at.strftime('%Y-%m-%dT%H:%M:%S%z')
 
     records = [item.__dict__ for item in filtered]
 
