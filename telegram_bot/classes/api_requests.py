@@ -138,7 +138,7 @@ class AdminAPI(API):
             "telegram_id": telegram_id
         }
         result: 'DataStructure' = await cls._post_request(data=data, endpoint=endpoint)
-        return result.data if result.success else {}
+        return result.data
 
     @classmethod
     @logger.catch
@@ -148,7 +148,7 @@ class AdminAPI(API):
         # TODO: Need to test
         endpoint: str = cls.__URL + '/get_active_users'
         result: 'DataStructure' = await cls._get_request(endpoint=endpoint)
-        return result.data
+        return result
 
     @classmethod
     @logger.catch
@@ -158,7 +158,7 @@ class AdminAPI(API):
         endpoint: str = cls.__URL + '/get_user_list'
         result: 'DataStructure' = await cls._get_request(endpoint=endpoint)
 
-        return result.data
+        return result
 
     @classmethod
     @logger.catch

@@ -5,11 +5,11 @@ from config import bot, Dispatcher, settings
 from aiogram.dispatcher.storage import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import Message, CallbackQuery
-from config import bot, Dispatcher
-from keyboards.keyboards import AdminButton, BaseMenu, YesOrNo, ChatTags, UrlButton
 from states.states import AdminState
 from classes.api_requests import AdminAPI, UserAPI
 from decorators.decorators import check_super_admin
+from keyboards.keyboards import AdminButton, BaseMenu, \
+    YesOrNo, ChatTags, UrlButton, StartMenu
 
 
 @check_super_admin
@@ -174,18 +174,19 @@ async def accumulate_data_and_send(message: Message, state: FSMContext) -> None:
 
         if response["status"] == 200:
             chat_id = await UserAPI.get_id_channel(tag=message.text)
+
             url = await bot.create_chat_invite_link(
-                chat_id=chat_id.message,
+                chat_id=str(chat_id.message),
                 expire_date=datetime.datetime.now().replace(
                     microsecond=0) + datetime.timedelta(hours=12),
                 member_limit=1
             )
 
             await bot.send_message(
-                text=f"🎁 Вам выдали доступ к тарифу {message.text}\n"
+                text=f"🎁 Вам выдали доступ к тарифу {message.text.upper()}\n"
                      f"Желаем приятного обучения!",
                 chat_id=data['user_id'],
-                reply_markup=UrlButton.keyboard(url=url)
+                reply_markup=UrlButton.keyboard(url=url.invite_link)
             )
 
         else:
@@ -204,7 +205,18 @@ async def accumulate_data_and_send(message: Message, state: FSMContext) -> None:
 
 
 @check_super_admin
-async def deactivate_sub(message: Message):
+async def deactivate_user_handle(message: Message) -> None:
+    """ Активирует хэндлер на деактивацию пользователя и ставит в стэйт """
+
+    await message.answer(
+        text=f"Перешлите сообщение от пользователя которого хотите внести в БД",
+        reply_markup=BaseMenu.keyboard()
+    )
+    await AdminState.deactivate_user.set()
+
+
+@check_super_admin
+async def deactivate_sub(message: Message, state: FSMContext):
     """ Запрашивает информацию о пользователе для деактивации """
 
     if not message.forward_from:
@@ -224,11 +236,19 @@ async def deactivate_sub(message: Message):
                  f"Сейчас он будет деактивирован!",
         )
 
-        result = await AdminAPI.deactivate_user(telegram_id=message.from_user.id)
-        await message.answer(
-            text=result,
-            reply_markup=AdminButton.keyboard()
-        )
+        response = await AdminAPI.deactivate_user(telegram_id=message.from_user.id)
+
+        if response["status"] == 200:
+            await message.answer(
+                text=f"Пользователь {message.from_user.id} успешно деактивирован\n"
+                     f"Он будет удален с канала в ближайшие 10 минут",
+                reply_markup=AdminButton.keyboard()
+            )
+        else:
+            await message.answer(
+                text=f"Пользователя нет в базе данных, для начала он должен нажать /start"
+            )
+        await state.finish()
 
 
 @check_super_admin
@@ -275,7 +295,9 @@ def register_admin_handlers(dp: Dispatcher) -> None:
     dp.register_message_handler(
         accumulate_data_and_send, state=AdminState.choose_tag_user)
     dp.register_message_handler(
-        deactivate_sub, Text(equals=AdminButton.take_sub), state=None)
+        deactivate_user_handle, Text(equals=AdminButton.take_sub), state=None)
+    dp.register_message_handler(
+        deactivate_sub, state=AdminState.deactivate_user)
     dp.register_message_handler(
         get_active_users_handler, Text(equals=AdminButton.active_subs))
     dp.register_message_handler(

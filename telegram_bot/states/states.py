@@ -12,3 +12,4 @@ class AdminState(StatesGroup):
     check_data = State()
     get_user_info = State()
     choose_tag_user = State()
+    deactivate_user = State()
