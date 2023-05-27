@@ -2,11 +2,11 @@ import datetime
 import time
 import loguru
 
-from config import bot, Dispatcher
+from config import bot, Dispatcher, HELPERS_CHAT
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
-from keyboards.keyboards import StartMenu, SubsMenu, PayButton, UrlButton
+from keyboards.keyboards import StartMenu, SubsMenu, PayButton, UrlButton, YesOrNo, BaseMenu
 from aiogram.dispatcher.filters import Text
-from states.states import SubscriptionState
+from states.states import SubscriptionState, TicketStates
 from aiogram.dispatcher.storage import FSMContext
 from classes.api_requests import UserAPI
 from utils.utils import write_to_storage, developer_photo
@@ -196,6 +196,103 @@ async def info_about(message: Message) -> None:
     )
 
 
+async def support_menu(message: Message) -> None:
+    """ Хэндлер для ответа на кнопку 'поддержка' """
+
+    await message.answer(
+        text=f'Вы желаете создать тиккет в службу поддержки?',
+        reply_markup=YesOrNo.keyboard(
+            prefix="yes",
+            suffix="ticket"
+        )
+    )
+
+    await TicketStates.open_ticket.set()
+
+
+async def ticket_create_helper(message: Message, state: FSMContext) -> None:
+    """
+    Обрабатывает нажатие на кнопку для создание тиккета в стэйте
+    """
+
+    await message.answer(
+        text=f"Опишите суть вашей проблемы либо вопрос.\n"
+             f"Наши хелперы свяжутся с вами и вы получите ответ в ближайшее время.\n"
+             f""
+             f"\nЕсли вы передумали - нажмите кнопку \"Отмена\"",
+        reply_markup=BaseMenu.keyboard()
+    )
+
+    await TicketStates.input_ticket_info.set()
+    await state.finish()
+
+
+async def get_ticket_data_from_user(message: Message, state: FSMContext) -> None:
+    """
+    Забирает сообщение тикета у пользователя и проходит дополнительную проверку на правильность введенного запроса
+    """
+
+    if len(message.text) < 3500:
+
+        async with state.proxy() as data:
+            data["username"] = message.from_user.username
+            data["first_name"] = message.from_user.first_name
+            data["last_name"] = message.from_user.last_name
+            data["created_at"] = datetime.datetime.now().replace(microsecond=0)
+            data["text"] = message.text
+            data["user_id"] = message.from_user.id
+
+            await message.answer(text=f"Тикет успешно создан, проверьте правильность введенных данных\n"
+                                      f"\nВаш username: {message.from_user.username}"
+                                      f"\nВаше имя: {message.from_user.first_name} {'' if message.from_user.last_name is None else message.from_user.last_name}"
+                                      f"\nДата создания: {datetime.datetime.now().replace(microsecond=0)}"
+                                      f"\n\nТекст: {message.text}"
+                                      f"\n\n\n"
+                                      f"Отправляем тикет?",
+                                reply_markup=YesOrNo.keyboard())
+            await TicketStates.accept_ticket.set()
+    else:
+        await bot.send_message(
+            chat_id=message.from_user.id,
+            text=f"Вы ввели текст превышающий ограничение!\n"
+                 f"Максимальное кол-во символов: 3500 символов\n"
+                 f"Вы ввели: {len(message.text)}",
+            reply_markup=StartMenu.keyboard()
+        )
+        await state.finish()
+
+
+async def accept_ticket_or_decline(callback: CallbackQuery, state: FSMContext) -> None:
+    """
+    Обрабатывает колбэки при отправке или отмене создания нового тикета
+    """
+
+    async with state.proxy() as data:
+
+        text = f"📌 НОВЫЙ ТИКЕТ 📌\n\n" \
+               f"ID: | {data['user_id']} | \n" \
+               f"Username: {data['username']}" \
+               f"\nИмя: {data['first_name']}\n" \
+               f"Фамилия: {data['last_name']}\n" \
+               f"Дата создания: {data['created_at']}\n" \
+               f"\n\n" \
+               f"{data['text']}"
+
+        if len(text) > 4096:
+            for x in range(0, len(text), 4096):
+                await bot.send_message(chat_id=int(HELPERS_CHAT), text=text[x:x + 4096])
+        else:
+            await bot.send_message(chat_id=int(HELPERS_CHAT), text=text)
+
+        await bot.send_message(
+            chat_id=callback.from_user.id,
+            text=f"Ваш тикет успешно отправлен.\n"
+                 f"Вы получите ответ в течении ближайшего времени, ожидайте ответа хелпера",
+            reply_markup=StartMenu.keyboard()
+        )
+    await state.finish()
+
+
 def register_main_handlers(dp: Dispatcher) -> None:
     """ Регистрирует MAIN хэндлеры приложения """
 
@@ -209,6 +306,14 @@ def register_main_handlers(dp: Dispatcher) -> None:
         payment_callback, state=SubscriptionState.choose_sub_packet)
     dp.register_message_handler(
         info_about, Text(equals=StartMenu.information), state=None)
+    dp.register_message_handler(
+        support_menu, Text(equals=StartMenu.support), state=None)
+    dp.register_message_handler(
+        ticket_create_helper, state=TicketStates.open_ticket)
+    dp.register_message_handler(
+        get_ticket_data_from_user, state=TicketStates.input_ticket_info)
+    dp.register_message_handler(
+        accept_ticket_or_decline, state=TicketStates.accept_ticket)
     dp.register_message_handler(
         cancel_handler, Text(equals="Отмена" or "отмена"), state=["*"])
 

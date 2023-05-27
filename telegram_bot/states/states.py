@@ -13,3 +13,9 @@ class AdminState(StatesGroup):
     get_user_info = State()
     choose_tag_user = State()
     deactivate_user = State()
+
+
+class TicketStates(StatesGroup):
+    open_ticket = State()
+    input_ticket_info = State()
+    accept_ticket = State()
