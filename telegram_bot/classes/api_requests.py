@@ -148,7 +148,7 @@ class AdminAPI(API):
         # TODO: Need to test
         endpoint: str = cls.__URL + '/get_active_users'
         result: 'DataStructure' = await cls._get_request(endpoint=endpoint)
-        return result
+        return result if isinstance(result, list) else []
 
     @classmethod
     @logger.catch

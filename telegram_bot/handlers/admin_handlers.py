@@ -257,7 +257,14 @@ async def get_active_users_handler(message: Message) -> None:
     """ Реагирует на кнопку 'Активные пользователи' """
 
     result = await AdminAPI.get_active_users()
-    await collect_data_and_send(data=result, message=message)
+    if result:
+        loguru.logger.info(f"Пришло с DB: {result}")
+        await collect_data_and_send(data=result, message=message)
+    else:
+        await message.answer(
+            text=f"В базе данных нет активных пользователей",
+            reply_markup=AdminButton.keyboard()
+        )
 
 
 @check_super_admin
@@ -265,7 +272,13 @@ async def get_service_users(message: Message) -> None:
     """ Реагирует на кнопку 'Все пользователи' """
 
     result = await AdminAPI.get_all_users()
-    await collect_data_and_send(message=message, data=result)
+    if result:
+        await collect_data_and_send(message=message, data=result)
+    else:
+        await message.answer(
+            text=f"В базе данных нет пользователей",
+            reply_markup=AdminButton.keyboard()
+        )
 
 
 def register_admin_handlers(dp: Dispatcher) -> None:

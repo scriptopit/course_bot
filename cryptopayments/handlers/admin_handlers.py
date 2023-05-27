@@ -55,7 +55,8 @@ async def activate_user(data: UserActivityChange, request: Request) -> dict:
     response = await User.filter(telegram_id=data.telegram_id).update(
         tag=data.tag,
         status=Statuses.member,
-        expired_at=datetime.datetime.now().replace(microsecond=0)
+        expired_at=datetime.datetime.fromisoformat(
+            datetime.datetime.now().isoformat())
     )
 
     if response:
@@ -70,9 +71,9 @@ async def get_active_users(request: Request) -> list:
     filtered = await User.filter(status=Statuses.member)
 
     for item in filtered:
-        item.expired_at = item.expired_at.strftime('%Y-%m-%dT%H:%M:%S%z')
-        item.updated_at = item.updated_at.strftime('%Y-%m-%dT%H:%M:%S%z')
-        item.created_at = item.created_at.strftime('%Y-%m-%dT%H:%M:%S%z')
+        item.expired_at = str(datetime.datetime.fromisoformat(str(item.expired_at)))
+        item.updated_at = str(datetime.datetime.fromisoformat(str(item.updated_at)))
+        item.created_at = str(datetime.datetime.fromisoformat(str(item.created_at)))
 
     records = [item.__dict__ for item in filtered]
 
