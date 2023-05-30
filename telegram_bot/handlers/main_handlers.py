@@ -201,30 +201,26 @@ async def support_menu(message: Message) -> None:
 
     await message.answer(
         text=f'Вы желаете создать тиккет в службу поддержки?',
-        reply_markup=YesOrNo.keyboard(
-            prefix="yes",
-            suffix="ticket"
-        )
+        reply_markup=YesOrNo.keyboard()
     )
 
     await TicketStates.open_ticket.set()
 
 
-async def ticket_create_helper(message: Message, state: FSMContext) -> None:
+async def ticket_create_helper(message: Message) -> None:
     """
     Обрабатывает нажатие на кнопку для создание тиккета в стэйте
     """
 
     await message.answer(
-        text=f"Опишите суть вашей проблемы либо вопрос.\n"
-             f"Наши хелперы свяжутся с вами и вы получите ответ в ближайшее время.\n"
+        text=f"💡 Опишите суть вашей проблемы либо вопрос.\n"
+             f"💼 Наши хелперы свяжутся с вами и вы получите ответ в ближайшее время.\n"
              f""
              f"\nЕсли вы передумали - нажмите кнопку \"Отмена\"",
         reply_markup=BaseMenu.keyboard()
     )
 
     await TicketStates.input_ticket_info.set()
-    await state.finish()
 
 
 async def get_ticket_data_from_user(message: Message, state: FSMContext) -> None:
@@ -242,14 +238,19 @@ async def get_ticket_data_from_user(message: Message, state: FSMContext) -> None
             data["text"] = message.text
             data["user_id"] = message.from_user.id
 
-            await message.answer(text=f"Тикет успешно создан, проверьте правильность введенных данных\n"
-                                      f"\nВаш username: {message.from_user.username}"
-                                      f"\nВаше имя: {message.from_user.first_name} {'' if message.from_user.last_name is None else message.from_user.last_name}"
-                                      f"\nДата создания: {datetime.datetime.now().replace(microsecond=0)}"
-                                      f"\n\nТекст: {message.text}"
-                                      f"\n\n\n"
-                                      f"Отправляем тикет?",
-                                reply_markup=YesOrNo.keyboard())
+            await message.answer(
+                text=f"Тикет успешно создан, "
+                     f"проверьте правильность введенных данных\n"
+                     f"\nВаш username: {message.from_user.username}"
+                     f"\nВаше имя: {message.from_user.first_name} "
+                     f"{'' if data['last_name'] is None else data['last_name']}"
+                     f"\nДата создания: {datetime.datetime.now().replace(microsecond=0)}"
+                     f"\n\n*Текст: {message.text}*"
+                     f"\n\n\n"
+                     f"Отправляем тикет?",
+                reply_markup=YesOrNo.keyboard(),
+                parse_mode="Markdown"
+            )
             await TicketStates.accept_ticket.set()
     else:
         await bot.send_message(

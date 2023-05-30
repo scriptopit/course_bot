@@ -39,4 +39,5 @@ SESSION_STRING = os.getenv("SESSION_STRING")
 
 KICK_RATE = int(os.getenv("KICK_RATE", 20))
 HELP_RATE = int(os.getenv("HELP_RATE", 10))
-HELPERS_CHAT = int(os.getenv("HELPERS_CHAT"))
+# HELPERS_CHAT = int(os.getenv("HELPERS_CHAT"))
+HELPERS_CHAT: int = -1001646837206
