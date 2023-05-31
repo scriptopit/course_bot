@@ -7,7 +7,7 @@ from fastapi import APIRouter, Request, Response
 
 from services.utils import check_token, create_invoice, get_invoice_status
 from schemas.data_schemas import DataStructure
-from models.models import User, Statuses, Group
+from models.models import User, Statuses, Group, Articles
 from services import exceptions
 from schemas.schemas import UserCreate,\
     SubscriptionUser, UserTelegramId, GetChannelId, UserActivityChange
@@ -97,5 +97,23 @@ async def get_id_channel(data: GetChannelId, request: Request):
     result.success = True
     return result.as_dict()
 
+
+@user_router.post("/get_current_module", response_model=DataStructure, tags=['user'])
+async def get_current_module(user: UserTelegramId, request: Request):
+    await check_token(request)
+
+    result = DataStructure()
+    user_model = await User.get_or_none(telegram_id=user.telegram_id)
+
+    if user_model:
+        current_module = user_model.module_level
+
+        article = await Articles.get_or_none(module_id=current_module)
+        if article:
+            result.status = 200
+            result.success = True
+            result.message = article.data_links
+
+    return result.as_dict()
 
 

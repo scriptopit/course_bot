@@ -285,10 +285,9 @@ async def add_new_lesson(message: Message) -> None:
     """ Хэндлер на добавление нового модуля в БД """
 
     modules = await AdminAPI.get_modules()
-    loguru.logger.info(f"{modules}")
 
     await message.answer(
-        text=f"Введите порядковый номер модуля который вы хотели бы модифицировать",
+        text=f"Выберите порядковый номер модуля который вы хотели бы модифицировать",
         reply_markup=ModulesButtons.keyboard(modules)
     )
     await AdminState.add_lesson.set()
@@ -297,8 +296,10 @@ async def add_new_lesson(message: Message) -> None:
 async def callback_module_update(callback: CallbackQuery, state: FSMContext) -> None:
     """ Реагирует на коллбэки администратора и делает update данных в БД """
 
+    await callback.message.delete()
+
     async with state.proxy() as data:
-        data["module_id"] = callback.data
+        data["module_id"] = int(callback.data.split(" ")[0])
 
     await AdminState.get_module_links.set()
 
@@ -314,14 +315,48 @@ async def module_info(message: Message, state: FSMContext) -> None:
 
     links = ""
     for link in message.text.split(" "):
-        links += link + "\n"
+        links += link + " \n"
 
-    async with state.proxy() as data:
-        data["links"] = links
+    data_state = await state.get_data()
+    success_update = await AdminAPI.add_module(module_id=data_state['module_id'], links=links)
+
+    if success_update["result"]:
+        await message.answer(
+            text=f"Успешный апдэйт модуля {data_state['module_id']}",
+            reply_markup=AdminButton.keyboard()
+        )
+    await state.finish()
 
 
-# async def add_new_module(message: Message) -> None:
-#     """ Хэндлер на добавление нового модуля в базу данных """
+async def add_level(message: Message) -> None:
+    """ Добавляет +1 лвл пользователю """
+
+    await message.answer(
+        text=f"Пришлите сюда ID пользователя кому хотите выдать зачет\n"
+             f"Посмотреть можно его в меню 'Активные пользователи'",
+        reply_markup=BaseMenu.keyboard()
+    )
+
+    await AdminState.issue_credit.set()
+
+
+async def rating_user(message: Message) -> None:
+    """ Выдать пользователю +1 оуенку """
+
+    result = await AdminAPI.add_rating(telegram_id=message.text)
+
+    if result["result"]:
+
+        await bot.send_message(
+            text=f"🌟 Вы получили зачет по домашнему заданию.\n"
+                 f"Вам открыт доступ к следующему уроку: {result['result']}",
+            chat_id=message.text,
+            reply_markup=StartMenu.keyboard()
+        )
+
+        await message.answer(
+            text=f"Пользователь {message.text} получил зачет по модулю {result['result'] - 1}"
+        )
 
 
 def register_admin_handlers(dp: Dispatcher) -> None:
@@ -357,8 +392,10 @@ def register_admin_handlers(dp: Dispatcher) -> None:
         add_new_lesson, Text(equals=AdminButton.modify_lesson))
     dp.register_message_handler(
         module_info, state=AdminState.get_module_links)
-    # dp.register_message_handler(
-    #     add_new_module, Text(equals=))
-    dp.register_message_handler(
+    dp.register_callback_query_handler(
         callback_module_update, state=AdminState.add_lesson)
+    dp.register_message_handler(
+        add_level, Text(equals=AdminButton.add_level_button))
+    dp.register_message_handler(
+        rating_user, state=AdminState.issue_credit)
 

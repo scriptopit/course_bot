@@ -67,13 +67,14 @@ class Group(models.Model):
         return self.tag
 
 
-class Modules(models.Model):
+class Articles(models.Model):
     id = fields.IntField(pk=True)
     module_id = fields.IntField(unique=True, description="Module number")
-    data_links = fields.CharField(max_length=500, description="Data about module links")
+    data_links = fields.CharField(max_length=500, description="Module links")
 
     class Meta:
-        table_description = "modules"
+        table = "articles"
 
     def __str__(self):
-        return self.id
+        return str(self.id)
+

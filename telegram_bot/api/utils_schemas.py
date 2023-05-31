@@ -24,3 +24,11 @@ class UserModel(BaseModel):
 
     def as_dict(self) -> dict:
         return self.__dict__
+
+
+class ModulesIds(BaseModel):
+    module_id: str
+
+    def as_dict(self) -> dict:
+        return self.__dict__
+

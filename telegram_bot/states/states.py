@@ -15,6 +15,7 @@ class AdminState(StatesGroup):
     deactivate_user = State()
     add_lesson = State()
     get_module_links = State()
+    issue_credit = State()
 
 
 class TicketStates(StatesGroup):

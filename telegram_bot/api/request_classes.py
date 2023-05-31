@@ -4,9 +4,10 @@ import aiohttp.client_exceptions
 import aiohttp.http_exceptions
 
 from config import DB_KEY_VALIDATION, logger
-from api.utils_schemas import DataStructure, UserModel
+from api.utils_schemas import DataStructure, UserModel, ModulesIds
 from classes.errors_reporter import MessageReporter
 from abc import abstractmethod, ABC
+import pydantic.error_wrappers
 
 
 class RequestSender(ABC):
@@ -89,7 +90,11 @@ class RequestSender(ABC):
                 return DataStructure(**data)
 
         if data and isinstance(data, list):
-            return [UserModel(**item) for item in data]
+            try:
+                return [UserModel(**item) for item in data]
+            except pydantic.error_wrappers.ValidationError:
+                # return [ModulesIds(**item) for item in data]
+                return [item["module_id"] for item in data]
 
         return DataStructure(status=status, data=data)
 

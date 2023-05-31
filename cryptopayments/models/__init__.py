@@ -1,1 +1,1 @@
-from models.models import User, Group
+from models.models import User, Group, Articles

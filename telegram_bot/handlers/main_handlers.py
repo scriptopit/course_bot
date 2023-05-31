@@ -316,20 +316,29 @@ async def my_academy_stats(message: Message) -> None:
 async def homework_menu(message: Message) -> None:
     """ Меню сдачи домашней работы """
 
-    # TODO: написать работу с API и передачу материала с ДЗ куратору
     await message.answer(
-        text=f"Меню для сдачи домашнего задания",
-        reply_markup=None
+        text=f"COMING SOON",
+        reply_markup=StartMenu.keyboard()
     )
 
 
 async def get_next_lesson(message: Message) -> None:
     """ Отрабатывает для выдачи пользователю нового учебного материала """
 
-    await message.answer(
-        text=f"Вот ваша следующая тема для учебы.",
-        reply_markup=StudentButtons.keyboard()
-    )
+    links = await UserAPI.get_current_module(telegram_id=message.from_user.id)
+
+    if links:
+        await message.answer(
+            text=f"🐍 Вот следующий материал для изучения\n"
+                 f"По готовности сдайте домашнее задание своему куратору\n\n"
+                 f"{links}",
+            reply_markup=StudentButtons.keyboard()
+        )
+    else:
+        await message.answer(
+            text=f"🐍 Вы еще не начали учиться в нашей академии, сначала выберите тариф",
+            reply_markup=StartMenu.keyboard()
+        )
 
 
 def register_main_handlers(dp: Dispatcher) -> None:

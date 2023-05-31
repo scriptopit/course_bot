@@ -8,7 +8,7 @@ from typing import Any
 from services import exceptions
 from schemas.data_schemas import UserModel
 from models.models import User, \
-    Statuses, Group, Modules
+    Statuses, Group, Articles
 from schemas.schemas import UserTelegramId, UserPydantic,\
     AddChanel, AddPacket, UserActivityChange, GetModuleData, AddModuleForm
 
@@ -96,12 +96,11 @@ async def add_channel(channel: AddChanel, request: Request) -> dict[str, Any]:
         raise exceptions.ChannelExistsException
 
 
-@admin_router.get("/get_modules", tags=['admin'])
+@admin_router.get("/get_modules", tags=['admin'], response_model=list[GetModuleData])
 async def get_modules(request: Request):
     await check_token(request)
-    a = await Modules.all()
-    loguru.logger.info(f"Вошел в функцию. Гет: {a}")
-    return await Modules.all()
+
+    return await Articles.all()
 
 
 @admin_router.post("/add_module", tags=['admin'])
@@ -110,9 +109,31 @@ async def add_module(module: AddModuleForm, request: Request):
 
     module_create: dict = {
         "module_id": module.module_id,
-        "links": module.links
+        "data_links": module.links
     }
-    response = await Modules.create(**module_create)
-    return response
+
+    result = await Articles.get_or_none(module_id=module.module_id)
+
+    if result is None:
+        await Articles.create(**module_create)
+    else:
+        await Articles.filter(module_id=module.module_id).update(data_links=module.links)
+    return {"result": True}
+
+
+@admin_router.post("/add_rating", tags=['admin'])
+async def add_rating(user: UserTelegramId, request: Request):
+    await check_token(request)
+
+    current_rating = await User.get_or_none(telegram_id=user.telegram_id)
+    if not current_rating:
+        return {}
+
+    current_module = int(current_rating.module_level) + 1
+    result = await User.filter(telegram_id=user.telegram_id).update(module_level=current_module)
+
+    if result:
+        return {"result": current_module}
+    return {"result": result}
 
 

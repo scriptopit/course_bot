@@ -20,7 +20,6 @@ class API:
                        f'\nData: {data}')
         return await PostRequest(data=data, url=url).send_request()
 
-
     @classmethod
     @logger.catch
     async def _get_request(cls, endpoint: str) -> 'DataStructure':
@@ -67,6 +66,19 @@ class UserAPI(API):
         result: 'DataStructure' = await cls._post_request(data=data, endpoint=endpoint)
 
         return result.message if result.success else {}
+
+    @classmethod
+    @logger.catch
+    async def get_current_module(cls: 'UserAPI', telegram_id: int):
+        """ Возвращает ссылки модуля для пользователя """
+
+        endpoint: str = cls.__URL + '/get_current_module'
+        data = {
+            "telegram_id": telegram_id
+        }
+
+        result = await cls._post_request(data=data, endpoint=endpoint)
+        return result.message
 
     @classmethod
     @logger.catch
@@ -135,7 +147,7 @@ class AdminAPI(API):
 
         endpoint: str = cls.__URL + "/get_modules"
         result: 'DataStructure' = await cls._get_request(endpoint=endpoint)
-        return result.data
+        return result
 
     @classmethod
     @logger.catch
@@ -150,6 +162,18 @@ class AdminAPI(API):
 
         result: 'DataStructure' = await cls._post_request(endpoint=endpoint, data=data)
         loguru.logger.info(f"результат: {result}")
+        return result.data
+
+    @classmethod
+    @logger.catch
+    async def add_rating(cls, telegram_id: int):
+        """ Добавить +1 рэйтинг пользователю """
+
+        endpoint: str = cls.__URL + "/add_rating"
+        data = {
+            "telegram_id": telegram_id
+        }
+        result: 'DataStructure' = await cls._post_request(endpoint=endpoint, data=data)
         return result.data
 
     @classmethod

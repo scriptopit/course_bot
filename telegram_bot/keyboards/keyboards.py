@@ -38,10 +38,10 @@ class BaseMenu:
 class StartMenu(BaseMenu):
     """ Стандартное меню пользователя """
 
-    buy_subscription: str = "Купить подписку"
-    support: str = "Поддержка"
-    information: str = "Информация"
-    student_menu: str = "Меню ученика"
+    buy_subscription: str = "💡 Купить подписку"
+    support: str = "🆘 Поддержка"
+    information: str = "ℹ️ Информация"
+    student_menu: str = "📚 Меню ученика"
 
     @classmethod
     @logger.catch
@@ -102,6 +102,7 @@ class AdminButton(BaseMenu):
     active_subs = f"Активные пользователи"
     all_users = f"Все пользователи"
     modify_lesson = f"Добавить урок"
+    add_level_button = f"Выдать зачет"
 
     @classmethod
     @logger.catch
@@ -114,7 +115,8 @@ class AdminButton(BaseMenu):
             KeyboardButton(text=cls.take_sub),
             KeyboardButton(text=cls.active_subs),
             KeyboardButton(text=cls.all_users),
-            KeyboardButton(text=cls.modify_lesson)
+            KeyboardButton(text=cls.modify_lesson),
+            KeyboardButton(text=cls.add_level_button)
         )
 
 
@@ -176,9 +178,9 @@ class UrlButton:
 class StudentButtons(BaseMenu):
     """ Возвращает кнопки образовательного меню """
 
-    next_module = "Получить новую тему"
-    submit_homework = "Сдать работу ментору"
-    my_academy = "Моя успеваемость"
+    next_module = "📕 Получить новую тему"
+    submit_homework = "👨‍🏫 Сдать работу ментору"
+    my_academy = "📊 Моя успеваемость"
 
     @classmethod
     @logger.catch
@@ -201,7 +203,11 @@ class ModulesButtons:
         keyboard = default_inline_keyboard()
 
         for x in range(1, 31):
-            keyboard.add(InlineKeyboardButton(text=str(x), callback_data=str(x)))
+            if x in modules:
+                x = f"{x} ✅"
+            keyboard.add(
+                InlineKeyboardButton(text=str(x), callback_data=str(x))
+            )
 
         return keyboard
 
