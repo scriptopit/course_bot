@@ -346,7 +346,6 @@ async def rating_user(message: Message) -> None:
     result = await AdminAPI.add_rating(telegram_id=message.text)
 
     if result["result"]:
-
         await bot.send_message(
             text=f"🌟 Вы получили зачет по домашнему заданию.\n"
                  f"Вам открыт доступ к следующему уроку: {result['result']}",
