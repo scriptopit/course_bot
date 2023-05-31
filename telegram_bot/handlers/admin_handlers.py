@@ -10,7 +10,7 @@ from classes.api_requests import AdminAPI, UserAPI
 from decorators.decorators import check_super_admin
 from utils.utils import collect_data_and_send
 from keyboards.keyboards import AdminButton, BaseMenu, \
-    YesOrNo, ChatTags, UrlButton, StartMenu
+    YesOrNo, ChatTags, UrlButton, StartMenu, ModulesButtons
 
 
 @check_super_admin
@@ -281,6 +281,49 @@ async def get_service_users(message: Message) -> None:
         )
 
 
+async def add_new_lesson(message: Message) -> None:
+    """ Хэндлер на добавление нового модуля в БД """
+
+    modules = await AdminAPI.get_modules()
+    loguru.logger.info(f"{modules}")
+
+    await message.answer(
+        text=f"Введите порядковый номер модуля который вы хотели бы модифицировать",
+        reply_markup=ModulesButtons.keyboard(modules)
+    )
+    await AdminState.add_lesson.set()
+
+
+async def callback_module_update(callback: CallbackQuery, state: FSMContext) -> None:
+    """ Реагирует на коллбэки администратора и делает update данных в БД """
+
+    async with state.proxy() as data:
+        data["module_id"] = callback.data
+
+    await AdminState.get_module_links.set()
+
+    await callback.message.answer(
+        text=f"Введите новые ссылки на этот модуль",
+        reply_markup=BaseMenu.keyboard()
+    )
+    await callback.answer()
+
+
+async def module_info(message: Message, state: FSMContext) -> None:
+    """ Собираем информацию про модуль который хотим изменить """
+
+    links = ""
+    for link in message.text.split(" "):
+        links += link + "\n"
+
+    async with state.proxy() as data:
+        data["links"] = links
+
+
+# async def add_new_module(message: Message) -> None:
+#     """ Хэндлер на добавление нового модуля в базу данных """
+
+
 def register_admin_handlers(dp: Dispatcher) -> None:
     """ Регистрирует админ-хэндлеры приложения """
 
@@ -310,4 +353,12 @@ def register_admin_handlers(dp: Dispatcher) -> None:
         get_active_users_handler, Text(equals=AdminButton.active_subs))
     dp.register_message_handler(
         get_service_users, Text(equals=AdminButton.all_users))
+    dp.register_message_handler(
+        add_new_lesson, Text(equals=AdminButton.modify_lesson))
+    dp.register_message_handler(
+        module_info, state=AdminState.get_module_links)
+    # dp.register_message_handler(
+    #     add_new_module, Text(equals=))
+    dp.register_message_handler(
+        callback_module_update, state=AdminState.add_lesson)
 

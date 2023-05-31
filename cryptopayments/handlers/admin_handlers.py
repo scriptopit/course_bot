@@ -8,9 +8,9 @@ from typing import Any
 from services import exceptions
 from schemas.data_schemas import UserModel
 from models.models import User, \
-    Statuses, Group
+    Statuses, Group, Modules
 from schemas.schemas import UserTelegramId, UserPydantic,\
-    AddChanel, AddPacket, UserActivityChange
+    AddChanel, AddPacket, UserActivityChange, GetModuleData, AddModuleForm
 
 
 admin_router = APIRouter()
@@ -94,4 +94,25 @@ async def add_channel(channel: AddChanel, request: Request) -> dict[str, Any]:
         return response
     else:
         raise exceptions.ChannelExistsException
+
+
+@admin_router.get("/get_modules", tags=['admin'])
+async def get_modules(request: Request):
+    await check_token(request)
+    a = await Modules.all()
+    loguru.logger.info(f"Вошел в функцию. Гет: {a}")
+    return await Modules.all()
+
+
+@admin_router.post("/add_module", tags=['admin'])
+async def add_module(module: AddModuleForm, request: Request):
+    await check_token(request)
+
+    module_create: dict = {
+        "module_id": module.module_id,
+        "links": module.links
+    }
+    response = await Modules.create(**module_create)
+    return response
+
 

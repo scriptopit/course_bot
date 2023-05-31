@@ -13,6 +13,8 @@ class AdminState(StatesGroup):
     get_user_info = State()
     choose_tag_user = State()
     deactivate_user = State()
+    add_lesson = State()
+    get_module_links = State()
 
 
 class TicketStates(StatesGroup):

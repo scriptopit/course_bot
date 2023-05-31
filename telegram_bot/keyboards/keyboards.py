@@ -16,6 +16,12 @@ def default_keyboard() -> ReplyKeyboardMarkup:
     )
 
 
+def default_inline_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        row_width=2
+    )
+
+
 @dataclass(frozen=True)
 class BaseMenu:
     cancel_key: str = "Отмена"
@@ -35,6 +41,7 @@ class StartMenu(BaseMenu):
     buy_subscription: str = "Купить подписку"
     support: str = "Поддержка"
     information: str = "Информация"
+    student_menu: str = "Меню ученика"
 
     @classmethod
     @logger.catch
@@ -44,7 +51,8 @@ class StartMenu(BaseMenu):
         return default_keyboard().add(
             KeyboardButton(cls.buy_subscription),
             KeyboardButton(cls.support),
-            KeyboardButton(cls.information)
+            KeyboardButton(cls.information),
+            KeyboardButton(cls.student_menu)
         )
 
 
@@ -93,6 +101,7 @@ class AdminButton(BaseMenu):
     take_sub = f"Забрать подписку"
     active_subs = f"Активные пользователи"
     all_users = f"Все пользователи"
+    modify_lesson = f"Добавить урок"
 
     @classmethod
     @logger.catch
@@ -104,7 +113,8 @@ class AdminButton(BaseMenu):
             KeyboardButton(text=cls.add_sub),
             KeyboardButton(text=cls.take_sub),
             KeyboardButton(text=cls.active_subs),
-            KeyboardButton(text=cls.all_users)
+            KeyboardButton(text=cls.all_users),
+            KeyboardButton(text=cls.modify_lesson)
         )
 
 
@@ -160,3 +170,38 @@ class UrlButton:
         return InlineKeyboardMarkup(row_width=2).add(
             InlineKeyboardButton(text=cls.join_group, url=url)
         )
+
+
+@dataclass(frozen=True)
+class StudentButtons(BaseMenu):
+    """ Возвращает кнопки образовательного меню """
+
+    next_module = "Получить новую тему"
+    submit_homework = "Сдать работу ментору"
+    my_academy = "Моя успеваемость"
+
+    @classmethod
+    @logger.catch
+    def keyboard(cls) -> Union[ReplyKeyboardMarkup]:
+        """ Возвращает объект клавиатуры """
+
+        return default_keyboard().add(
+            KeyboardButton(text=cls.next_module),
+            KeyboardButton(text=cls.submit_homework),
+            KeyboardButton(text=cls.my_academy)
+        )
+
+
+@dataclass(frozen=True)
+class ModulesButtons:
+    """ Возвращает кнопки со всеми номерами модулей """
+
+    @classmethod
+    def keyboard(cls, modules: list) -> Union[InlineKeyboardMarkup]:
+        keyboard = default_inline_keyboard()
+
+        for x in range(1, 31):
+            keyboard.add(InlineKeyboardButton(text=str(x), callback_data=str(x)))
+
+        return keyboard
+

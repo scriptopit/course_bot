@@ -130,6 +130,30 @@ class AdminAPI(API):
 
     @classmethod
     @logger.catch
+    async def get_modules(cls) -> Union[list]:
+        """ Возвращает список записанных в БД модулей """
+
+        endpoint: str = cls.__URL + "/get_modules"
+        result: 'DataStructure' = await cls._get_request(endpoint=endpoint)
+        return result.data
+
+    @classmethod
+    @logger.catch
+    async def add_module(cls, module_id: int, links: str) -> Union[dict, str]:
+        """ Добавляет новый модуль в базу данных """
+
+        endpoint: str = cls.__URL + "/add_module"
+        data = {
+            "module_id": module_id,
+            "links": links
+        }
+
+        result: 'DataStructure' = await cls._post_request(endpoint=endpoint, data=data)
+        loguru.logger.info(f"результат: {result}")
+        return result.data
+
+    @classmethod
+    @logger.catch
     async def deactivate_user(cls: 'AdminAPI', telegram_id: int) -> Union[dict, str]:
         """ Деактивировать пользователя """
 
@@ -191,15 +215,3 @@ class RootAPI(API):
             "new_price": new_price
         }
         return await cls._post_request(data=data, endpoint=endpoint)
-
-
-
-
-
-
-
-
-
-
-
-

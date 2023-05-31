@@ -38,4 +38,13 @@ class GetChannelId(BaseModel):
     tag: str
 
 
+class GetModuleData(BaseModel):
+    module_id: int
+
+
+class AddModuleForm(BaseModel):
+    module_id: int
+    links: str
+
+
 UserPydantic = pydantic_model_creator(User, exclude=('invoice_id',))

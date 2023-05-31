@@ -41,6 +41,7 @@ class User(models.Model):
     tag = fields.TextField(default="", max_length=50, description="Tag packet")
     status = fields.CharField(default="enemy", max_length=100, description="Member status")
     invoice_id = fields.BigIntField(default=0, description="Invoice id Crypto bot")
+    module_level = fields.IntField(default=0, description="Student experience")
 
     class PydanticMeta:
         table_description = "users"
@@ -65,3 +66,14 @@ class Group(models.Model):
     def __str__(self):
         return self.tag
 
+
+class Modules(models.Model):
+    id = fields.IntField(pk=True)
+    module_id = fields.IntField(unique=True, description="Module number")
+    data_links = fields.CharField(max_length=500, description="Data about module links")
+
+    class Meta:
+        table_description = "modules"
+
+    def __str__(self):
+        return self.id

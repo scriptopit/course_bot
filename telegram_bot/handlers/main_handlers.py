@@ -4,7 +4,8 @@ import loguru
 
 from config import bot, Dispatcher, HELPERS_CHAT
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
-from keyboards.keyboards import StartMenu, SubsMenu, PayButton, UrlButton, YesOrNo, BaseMenu
+from keyboards.keyboards import StartMenu, SubsMenu, \
+    PayButton, UrlButton, YesOrNo, BaseMenu, StudentButtons
 from aiogram.dispatcher.filters import Text
 from states.states import SubscriptionState, TicketStates
 from aiogram.dispatcher.storage import FSMContext
@@ -294,6 +295,43 @@ async def accept_ticket_or_decline(callback: CallbackQuery, state: FSMContext) -
     await state.finish()
 
 
+async def knowledge_menu(message: Message) -> None:
+    """ Меню ученика с активной подпиской """
+
+    await message.answer(
+        text=f"Перед вами меню образовательного портала",
+        reply_markup=StudentButtons.keyboard()
+    )
+
+
+async def my_academy_stats(message: Message) -> None:
+    """ Выводит пользователю статистику по его обучению """
+
+    await message.answer(
+        text=f"Статистика учебы пользователя. Его успеваемость",
+        reply_markup=StudentButtons.keyboard()
+    )
+
+
+async def homework_menu(message: Message) -> None:
+    """ Меню сдачи домашней работы """
+
+    # TODO: написать работу с API и передачу материала с ДЗ куратору
+    await message.answer(
+        text=f"Меню для сдачи домашнего задания",
+        reply_markup=None
+    )
+
+
+async def get_next_lesson(message: Message) -> None:
+    """ Отрабатывает для выдачи пользователю нового учебного материала """
+
+    await message.answer(
+        text=f"Вот ваша следующая тема для учебы.",
+        reply_markup=StudentButtons.keyboard()
+    )
+
+
 def register_main_handlers(dp: Dispatcher) -> None:
     """ Регистрирует MAIN хэндлеры приложения """
 
@@ -315,6 +353,14 @@ def register_main_handlers(dp: Dispatcher) -> None:
         get_ticket_data_from_user, state=TicketStates.input_ticket_info)
     dp.register_message_handler(
         accept_ticket_or_decline, state=TicketStates.accept_ticket)
+    dp.register_message_handler(
+        knowledge_menu, Text(equals=StartMenu.student_menu))
+    dp.register_message_handler(
+        my_academy_stats, Text(equals=StudentButtons.my_academy))
+    dp.register_message_handler(
+        homework_menu, Text(equals=StudentButtons.submit_homework))
+    dp.register_message_handler(
+        get_next_lesson, Text(equals=StudentButtons.next_module))
     dp.register_message_handler(
         cancel_handler, Text(equals="Отмена" or "отмена"), state=["*"])
 
