@@ -117,3 +117,17 @@ async def get_current_module(user: UserTelegramId, request: Request):
     return result.as_dict()
 
 
+@user_router.post("/get_module_id", response_model=DataStructure, tags=['user'])
+async def get_module_id(user: UserTelegramId, request: Request):
+    await check_token(request)
+
+    result = DataStructure()
+    user_model = await User.get_or_none(telegram_id=user.telegram_id)
+
+    if user_model:
+        current_module = user_model.module_level
+        result.message = current_module
+
+    result.status = 200
+    result.success = True
+    return result.as_dict()

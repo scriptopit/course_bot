@@ -82,6 +82,19 @@ class UserAPI(API):
 
     @classmethod
     @logger.catch
+    async def get_module_id(cls, telegram_id: int):
+        """ Возвращает ID модуля ученика """
+
+        endpoint: str = cls.__URL + '/get_module_id'
+        data = {
+            "telegram_id": telegram_id
+        }
+
+        result = await cls._post_request(data=data, endpoint=endpoint)
+        return result.message
+
+    @classmethod
+    @logger.catch
     async def get_user_status(
             cls: 'UserAPI', telegram_id: int) -> dict[str, int]:
 

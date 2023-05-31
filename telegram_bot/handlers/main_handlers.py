@@ -307,8 +307,11 @@ async def knowledge_menu(message: Message) -> None:
 async def my_academy_stats(message: Message) -> None:
     """ Выводит пользователю статистику по его обучению """
 
+    module_id = await UserAPI.get_module_id(telegram_id=message.from_user.id)
+
     await message.answer(
-        text=f"Статистика учебы пользователя. Его успеваемость",
+        text=f"🎩 На данный момент вы проходите {module_id} из 30 модулей\n"
+             f"💡 Дипломная работа: Не сдана",
         reply_markup=StudentButtons.keyboard()
     )
 
@@ -317,7 +320,8 @@ async def homework_menu(message: Message) -> None:
     """ Меню сдачи домашней работы """
 
     await message.answer(
-        text=f"COMING SOON",
+        text=f"COMING SOON\n\n"
+             f"Сдавай в личные сообщения своему куратору!",
         reply_markup=StartMenu.keyboard()
     )
 
