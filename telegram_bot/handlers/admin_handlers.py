@@ -309,7 +309,6 @@ async def add_new_lesson(message: Message) -> None:
     await AdminState.add_lesson.set()
 
 
-@private_message
 @check_super_admin
 async def callback_module_update(callback: CallbackQuery, state: FSMContext) -> None:
     """ Реагирует на коллбэки администратора и делает update данных в БД """

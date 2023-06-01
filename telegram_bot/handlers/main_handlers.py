@@ -101,7 +101,6 @@ async def choose_sub_packet(message: Message, state: FSMContext) -> None:
         await state.finish()
 
 
-@private_message
 async def payment_callback(callback: CallbackQuery, state: FSMContext) -> None:
     """ Ловит callback check_payment и отвечает на него """
 
