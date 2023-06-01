@@ -13,7 +13,6 @@ from classes.api_requests import UserAPI, AdminAPI
 from utils.utils import write_to_storage, developer_photo
 from api.utils_schemas import DataStructure
 from messages.main_message import *
-from aiogram.utils.callback_data import CallbackData
 
 
 async def main_menu(message: Message) -> None:
