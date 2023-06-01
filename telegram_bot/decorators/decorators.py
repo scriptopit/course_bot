@@ -24,7 +24,8 @@ def check_super_admin(func: Callable) -> Callable:
 
 @logger.catch
 def private_message(func):
-    async def wrapper(message: types.Message, state: FSMContext):
+    async def wrapper(*args, **kwargs):
+        message: Message = args[0]
         if message.chat.type == "private":
-            await func(message, FSMContext)
+            await func(*args, **kwargs)
     return wrapper
