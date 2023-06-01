@@ -47,4 +47,8 @@ class AddModuleForm(BaseModel):
     links: str
 
 
+class ChannelId(BaseModel):
+    channel_id: int
+
+
 UserPydantic = pydantic_model_creator(User, exclude=('invoice_id',))

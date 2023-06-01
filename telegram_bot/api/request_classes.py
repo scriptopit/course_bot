@@ -93,8 +93,12 @@ class RequestSender(ABC):
             try:
                 return [UserModel(**item) for item in data]
 
-            except pydantic.error_wrappers.ValidationError:
-                return [item["module_id"] for item in data]
+            except Exception:
+                try:
+                    return [item["module_id"] for item in data]
+
+                except Exception:
+                    return [item['channel_id'] for item in data]
 
         return DataStructure(status=status, data=data)
 

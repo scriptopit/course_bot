@@ -10,7 +10,8 @@ from schemas.data_schemas import UserModel
 from models.models import User, \
     Statuses, Group, Articles
 from schemas.schemas import UserTelegramId, UserPydantic,\
-    AddChanel, AddPacket, UserActivityChange, GetModuleData, AddModuleForm
+    AddChanel, AddPacket, UserActivityChange,\
+    GetModuleData, AddModuleForm, ChannelId
 
 
 admin_router = APIRouter()
@@ -136,4 +137,10 @@ async def add_rating(user: UserTelegramId, request: Request):
         return {"result": current_module}
     return {"result": result}
 
+
+@admin_router.get("/get_channels", response_model=list[ChannelId], tags=['admin'])
+async def get_channels(request: Request):
+    await check_token(request)
+
+    return await Group.all()
 

@@ -234,6 +234,14 @@ class AdminAPI(API):
         }
         return await cls._post_request(data=data, endpoint=endpoint)
 
+    @classmethod
+    @logger.catch
+    async def get_channels(cls) -> 'DataStructure':
+        """ Получить каналы для кика пользователей """
+
+        endpoint: str = cls.__URL + '/get_channels'
+        return await cls._get_request(endpoint=endpoint)
+
 
 class RootAPI(API):
     """ Класс для работы с ROOT API """

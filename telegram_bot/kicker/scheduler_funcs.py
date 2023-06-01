@@ -10,6 +10,7 @@ from aiogram.types.chat import Chat
 from classes.errors_reporter import MessageReporter
 from config import bot, logger, KICK_RATE, HELP_RATE, HELPERS_CHAT
 from kicker.get_channel_info import get_channel_data, get_helper_channel_data
+from api.utils_schemas import UserModel
 
 from classes.api_requests import UserAPI, AdminAPI
 
@@ -40,10 +41,11 @@ async def channel_kick_hackers(
 
     logger.info('List users for kicked received.\n Starting delete users for channel')
     count = 0
+
     for telegram_id in list_for_kicked:
         try:
-            logger.info(f'kick: {telegram_id}')
-            await bot.kick_chat_member(channel_id, telegram_id)
+            await bot.kick_chat_member(chat_id=channel_id, user_id=telegram_id)
+            await bot.unban_chat_member(chat_id=channel_id, user_id=telegram_id, only_if_banned=True)
             count += 1
         except aiogram.utils.exceptions.BadRequest as err:
             member: dict = all_members.get(telegram_id, {'error': 'Не удалось получить данные'})
@@ -67,7 +69,7 @@ async def kick_hackers() -> None:
     """
 
     logger.info(f'start kick_hackers: {datetime.datetime.utcnow()}')
-    channels: list[dict] = await AdminAPI.get_channels()
+    channels: list = await AdminAPI.get_channels()
 
     if not channels:
         logger.warning('scheduler_func.kick_hackers: No channel')
@@ -75,14 +77,15 @@ async def kick_hackers() -> None:
                                                     ' воспользуйтесь командой. \n/admin')
         return
 
-    all_users_data: list[dict] = await UserAPI.get_active_users()
-    all_users: list[int] = [user.get('telegram_id') for user in all_users_data]
+    all_users_data: list[UserModel] = await AdminAPI.get_active_users()
+    all_users: list[int] = [user.telegram_id for user in all_users_data]
     for channel_data in channels:
-        chat_id = channel_data.get('chat_id')
+        chat_id = channel_data
         try:
             logger.info(f' try get_channel_data: {datetime.datetime.utcnow()}\nGet admins list')
 
             all_members: dict[int, dict] = await get_channel_data(str(chat_id)[4:])
+            logger.info(f"users: {all_members}")
             if not all_members:
                 logger.warning('no all members')
                 await MessageReporter.send_report_to_admins(
@@ -96,7 +99,7 @@ async def kick_hackers() -> None:
                 all_members=all_members, all_users=all_users, channel_id=chat_id)
 
         except Exception as err:
-            logger.error(f' channel name : {channel_data.get("name")} {err}')
+            logger.error(f' channel name : {channel_data} {err}')
     logger.info(f' stop kick hackers: {datetime.datetime.utcnow()}')
 
 
@@ -120,7 +123,7 @@ async def get_updates_ticket() -> None:
 
 
 async def check_base():
-    # aioschedule.every(KICK_RATE).minutes.do(kick_hackers)
+    aioschedule.every(KICK_RATE).minutes.do(kick_hackers)
     aioschedule.every(HELP_RATE).minutes.do(get_updates_ticket)
     # aioschedule.every().day.at("9:00").do(mailing_to_members)
     while True:

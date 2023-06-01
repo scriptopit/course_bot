@@ -20,10 +20,6 @@ async def collect_data_and_send(data: list, message: Message) -> None:
     text = "telegram_id | username | tag | expired_at\n\n"
 
     for user in data:
-        # datetime_object = datetime.datetime.strptime(
-        #     user.expired_at, '%Y-%m-%dT%H:%M:%S%z').replace(
-        #     microsecond=0
-        # )
         datetime_object = datetime.datetime.fromisoformat(
             user.expired_at).replace(microsecond=0)
 

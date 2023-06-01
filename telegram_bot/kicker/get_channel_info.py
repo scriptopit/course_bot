@@ -1,3 +1,4 @@
+import loguru
 from telethon import TelegramClient
 
 from telethon.sessions import StringSession
@@ -80,7 +81,7 @@ async def get_helper_channel_data(ticket_chat: int):
 
                 example_ticket = await client.get_messages(my_channel, ids=ticket_message_id)
                 example_answer = await client.get_messages(my_channel, ids=answer_message_id)
-                if example_answer is not None and answer is not None:
+                if example_answer and example_ticket:
                     ticket = example_ticket.message
                     answer = example_answer.message
 
