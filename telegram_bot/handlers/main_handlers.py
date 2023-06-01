@@ -383,19 +383,19 @@ async def get_next_lesson(message: Message) -> None:
             reply_markup=StartMenu.keyboard()
         )
 
-
-async def del_keyboard(message: Message):
-    await message.reply(
-        text=f"Удалена клавиатура",
-        reply_markup=ReplyKeyboardRemove()
-    )
+#
+# async def del_keyboard(message: Message):
+#     await message.reply(
+#         text=f"Удалена клавиатура",
+#         reply_markup=ReplyKeyboardRemove()
+#     )
 
 
 def register_main_handlers(dp: Dispatcher) -> None:
     """ Регистрирует MAIN хэндлеры приложения """
 
-    dp.register_message_handler(
-        del_keyboard, commands=['/del'])
+    # dp.register_message_handler(
+    #     del_keyboard, commands=['/del'])
     dp.register_message_handler(
         cancel_handler, Text(equals="Отмена" or "отмена"), state=["*"])
     dp.register_message_handler(
