@@ -1,4 +1,5 @@
 from aiogram.types import Message
+from aiogram.dispatcher.storage import FSMContext
 from config import logger, settings
 from typing import Callable, Any
 from functools import wraps
@@ -25,5 +26,5 @@ def check_super_admin(func: Callable) -> Callable:
 def private_message(func):
     async def wrapper(message: types.Message):
         if message.chat.type == "private":
-            await func(message)
+            await func(message, FSMContext)
     return wrapper
