@@ -23,4 +23,4 @@ def register_debug_handler(dp: Dispatcher) -> None:
     """ Регистрирует дебаг хэндлер """
 
     dp.register_message_handler(
-        debug_handler, state=["*"], filters=ChatType.is_private)
+        debug_handler, state=["*"], custom_filters=ChatType.is_private)
