@@ -232,16 +232,16 @@ async def deactivate_sub(message: Message, state: FSMContext):
     else:
         await message.answer(
             reply_markup=AdminButton.keyboard(),
-            text=f"Идентификатор пользователя {message.from_user.last_name}:"
-                 f" {message.from_user.id}.\n"
+            text=f"Идентификатор пользователя {message.forward_from.last_name}:"
+                 f" {message.forward_from.id}.\n"
                  f"Сейчас он будет деактивирован!",
         )
 
-        response = await AdminAPI.deactivate_user(telegram_id=message.from_user.id)
+        response = await AdminAPI.deactivate_user(telegram_id=message.forward_from.id)
 
         if response["status"] == 200:
             await message.answer(
-                text=f"Пользователь {message.from_user.id} успешно деактивирован\n"
+                text=f"Пользователь {message.forward_from.id} успешно деактивирован\n"
                      f"Он будет удален с канала в ближайшие 10 минут",
                 reply_markup=AdminButton.keyboard()
             )
@@ -258,7 +258,6 @@ async def get_active_users_handler(message: Message) -> None:
 
     result = await AdminAPI.get_active_users()
     if result:
-        loguru.logger.info(f"Пришло с DB: {result}")
         await collect_data_and_send(data=result, message=message)
     else:
         await message.answer(
@@ -272,8 +271,10 @@ async def get_service_users(message: Message) -> None:
     """ Реагирует на кнопку 'Все пользователи' """
 
     result = await AdminAPI.get_all_users()
+
     if result:
         await collect_data_and_send(message=message, data=result)
+
     else:
         await message.answer(
             text=f"В базе данных нет пользователей",

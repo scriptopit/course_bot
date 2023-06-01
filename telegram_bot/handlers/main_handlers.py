@@ -9,7 +9,7 @@ from keyboards.keyboards import StartMenu, SubsMenu, \
 from aiogram.dispatcher.filters import Text
 from states.states import SubscriptionState, TicketStates
 from aiogram.dispatcher.storage import FSMContext
-from classes.api_requests import UserAPI
+from classes.api_requests import UserAPI, AdminAPI
 from utils.utils import write_to_storage, developer_photo
 from api.utils_schemas import DataStructure
 from messages.main_message import *
@@ -208,20 +208,28 @@ async def support_menu(message: Message) -> None:
     await TicketStates.open_ticket.set()
 
 
-async def ticket_create_helper(message: Message) -> None:
+async def ticket_create_helper(message: Message, state: FSMContext) -> None:
     """
     Обрабатывает нажатие на кнопку для создание тиккета в стэйте
     """
 
-    await message.answer(
-        text=f"💡 Опишите суть вашей проблемы либо вопрос.\n"
-             f"💼 Наши хелперы свяжутся с вами и вы получите ответ в ближайшее время.\n"
-             f""
-             f"\nЕсли вы передумали - нажмите кнопку \"Отмена\"",
-        reply_markup=BaseMenu.keyboard()
-    )
+    if message.text == YesOrNo.yes_button:
+        await message.answer(
+            text=f"💡 Опишите суть вашей проблемы либо вопрос.\n"
+                 f"💼 Наши хелперы свяжутся с вами и вы получите ответ в ближайшее время.\n"
+                 f""
+                 f"\nЕсли вы передумали - нажмите кнопку \"Отмена\"",
+            reply_markup=BaseMenu.keyboard()
+        )
 
-    await TicketStates.input_ticket_info.set()
+        await TicketStates.input_ticket_info.set()
+
+    else:
+        await state.finish()
+        await message.answer(
+            text=f"Главное меню",
+            reply_markup=StartMenu.keyboard()
+        )
 
 
 async def get_ticket_data_from_user(message: Message, state: FSMContext) -> None:
@@ -264,32 +272,39 @@ async def get_ticket_data_from_user(message: Message, state: FSMContext) -> None
         await state.finish()
 
 
-async def accept_ticket_or_decline(callback: CallbackQuery, state: FSMContext) -> None:
+async def accept_ticket_or_decline(message: Message, state: FSMContext) -> None:
     """
     Обрабатывает колбэки при отправке или отмене создания нового тикета
     """
 
-    async with state.proxy() as data:
+    if message.text == YesOrNo.yes_button:
+        async with state.proxy() as data:
 
-        text = f"📌 НОВЫЙ ТИКЕТ 📌\n\n" \
-               f"ID: | {data['user_id']} | \n" \
-               f"Username: {data['username']}" \
-               f"\nИмя: {data['first_name']}\n" \
-               f"Фамилия: {data['last_name']}\n" \
-               f"Дата создания: {data['created_at']}\n" \
-               f"\n\n" \
-               f"{data['text']}"
+            text = f"📌 НОВЫЙ ТИКЕТ 📌\n\n" \
+                   f"ID: | {data['user_id']} | \n" \
+                   f"Username: {data['username']}" \
+                   f"\nИмя: {data['first_name']}\n" \
+                   f"Фамилия: {data['last_name']}\n" \
+                   f"Дата создания: {data['created_at']}\n" \
+                   f"\n\n" \
+                   f"{data['text']}"
 
-        if len(text) > 4096:
-            for x in range(0, len(text), 4096):
-                await bot.send_message(chat_id=int(HELPERS_CHAT), text=text[x:x + 4096])
-        else:
-            await bot.send_message(chat_id=int(HELPERS_CHAT), text=text)
+            if len(text) > 4096:
+                for x in range(0, len(text), 4096):
+                    await bot.send_message(chat_id=int(HELPERS_CHAT), text=text[x:x + 4096])
+            else:
+                await bot.send_message(chat_id=int(HELPERS_CHAT), text=text)
 
-        await bot.send_message(
-            chat_id=callback.from_user.id,
-            text=f"Ваш тикет успешно отправлен.\n"
-                 f"Вы получите ответ в течении ближайшего времени, ожидайте ответа хелпера",
+            await bot.send_message(
+                chat_id=message.from_user.id,
+                text=f"Ваш тикет успешно отправлен.\n"
+                     f"Вы получите ответ в течении ближайшего времени, ожидайте ответа хелпера",
+                reply_markup=StartMenu.keyboard()
+            )
+
+    else:
+        await message.answer(
+            text=f"Главное меню",
             reply_markup=StartMenu.keyboard()
         )
     await state.finish()
@@ -298,10 +313,20 @@ async def accept_ticket_or_decline(callback: CallbackQuery, state: FSMContext) -
 async def knowledge_menu(message: Message) -> None:
     """ Меню ученика с активной подпиской """
 
-    await message.answer(
-        text=f"Перед вами меню образовательного портала",
-        reply_markup=StudentButtons.keyboard()
-    )
+    user_models = await AdminAPI.get_active_users()
+    clear_users = [user.telegram_id for user in user_models]
+
+    if message.from_user.id in clear_users:
+        await message.answer(
+            text=f"Перед вами меню образовательного портала",
+            reply_markup=StudentButtons.keyboard()
+        )
+    else:
+        await message.answer(
+            text=f"🐍 Это меню доступно только для учеников сервиса\n"
+                 f"🐍 Для начала необходимо приобрести подписку!",
+            reply_markup=StartMenu.keyboard()
+        )
 
 
 async def my_academy_stats(message: Message) -> None:
@@ -322,7 +347,7 @@ async def homework_menu(message: Message) -> None:
     await message.answer(
         text=f"COMING SOON\n\n"
              f"Сдавай в личные сообщения своему куратору!",
-        reply_markup=StartMenu.keyboard()
+        reply_markup=StudentButtons.keyboard()
     )
 
 
@@ -349,6 +374,8 @@ def register_main_handlers(dp: Dispatcher) -> None:
     """ Регистрирует MAIN хэндлеры приложения """
 
     dp.register_message_handler(
+        cancel_handler, Text(equals="Отмена" or "отмена"), state=["*"])
+    dp.register_message_handler(
         main_menu, commands=["start"], state=None)
     dp.register_message_handler(
         buy_subscription_packet, Text(equals=StartMenu.buy_subscription))
@@ -374,6 +401,4 @@ def register_main_handlers(dp: Dispatcher) -> None:
         homework_menu, Text(equals=StudentButtons.submit_homework))
     dp.register_message_handler(
         get_next_lesson, Text(equals=StudentButtons.next_module))
-    dp.register_message_handler(
-        cancel_handler, Text(equals="Отмена" or "отмена"), state=["*"])
 

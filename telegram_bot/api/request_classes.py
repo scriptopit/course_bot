@@ -92,8 +92,8 @@ class RequestSender(ABC):
         if data and isinstance(data, list):
             try:
                 return [UserModel(**item) for item in data]
+
             except pydantic.error_wrappers.ValidationError:
-                # return [ModulesIds(**item) for item in data]
                 return [item["module_id"] for item in data]
 
         return DataStructure(status=status, data=data)
