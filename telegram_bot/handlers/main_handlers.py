@@ -3,7 +3,7 @@ import time
 import loguru
 
 from config import bot, Dispatcher, HELPERS_CHAT
-from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove, ChatType
+from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from keyboards.keyboards import StartMenu, SubsMenu, \
     PayButton, UrlButton, YesOrNo, BaseMenu, StudentButtons
 from aiogram.dispatcher.filters import Text
@@ -373,31 +373,31 @@ def register_main_handlers(dp: Dispatcher) -> None:
     """ Регистрирует MAIN хэндлеры приложения """
 
     dp.register_message_handler(
-        cancel_handler, Text(equals="Отмена" or "отмена"), state=["*"], filters=ChatType.is_private)
+        cancel_handler, Text(equals="Отмена" or "отмена"), state=["*"])
     dp.register_message_handler(
-        main_menu, commands=["start"], state=None, filters=ChatType.is_private)
+        main_menu, commands=["start"], state=None)
     dp.register_message_handler(
-        buy_subscription_packet, Text(equals=StartMenu.buy_subscription), filters=ChatType.is_private)
+        buy_subscription_packet, Text(equals=StartMenu.buy_subscription))
     dp.register_message_handler(
-        choose_sub_packet, Text(contains="Python"), state=SubscriptionState.choose_sub_packet, filters=ChatType.is_private)
+        choose_sub_packet, Text(contains="Python"), state=SubscriptionState.choose_sub_packet)
     dp.register_callback_query_handler(
-        payment_callback, state=SubscriptionState.choose_sub_packet, filters=ChatType.is_private)
+        payment_callback, state=SubscriptionState.choose_sub_packet)
     dp.register_message_handler(
-        info_about, Text(equals=StartMenu.information), state=None, filters=ChatType.is_private)
+        info_about, Text(equals=StartMenu.information), state=None)
     dp.register_message_handler(
-        support_menu, Text(equals=StartMenu.support), state=None, filters=ChatType.is_private)
+        support_menu, Text(equals=StartMenu.support), state=None)
     dp.register_message_handler(
-        ticket_create_helper, state=TicketStates.open_ticket, filters=ChatType.is_private)
+        ticket_create_helper, state=TicketStates.open_ticket)
     dp.register_message_handler(
-        get_ticket_data_from_user, state=TicketStates.input_ticket_info, filters=ChatType.is_private)
+        get_ticket_data_from_user, state=TicketStates.input_ticket_info)
     dp.register_message_handler(
-        accept_ticket_or_decline, state=TicketStates.accept_ticket, filters=ChatType.is_private)
+        accept_ticket_or_decline, state=TicketStates.accept_ticket)
     dp.register_message_handler(
-        knowledge_menu, Text(equals=StartMenu.student_menu), filters=ChatType.is_private)
+        knowledge_menu, Text(equals=StartMenu.student_menu))
     dp.register_message_handler(
-        my_academy_stats, Text(equals=StudentButtons.my_academy), filters=ChatType.is_private)
+        my_academy_stats, Text(equals=StudentButtons.my_academy))
     dp.register_message_handler(
-        homework_menu, Text(equals=StudentButtons.submit_homework), filters=ChatType.is_private)
+        homework_menu, Text(equals=StudentButtons.submit_homework))
     dp.register_message_handler(
-        get_next_lesson, Text(equals=StudentButtons.next_module), filters=ChatType.is_private)
+        get_next_lesson, Text(equals=StudentButtons.next_module))
 

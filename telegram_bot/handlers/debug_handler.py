@@ -1,5 +1,5 @@
 from config import Dispatcher
-from aiogram.types import Message, ChatType
+from aiogram.types import Message
 from aiogram.dispatcher.storage import FSMContext
 from aiogram.dispatcher.filters import Text
 from keyboards.keyboards import StartMenu
@@ -23,4 +23,4 @@ def register_debug_handler(dp: Dispatcher) -> None:
     """ Регистрирует дебаг хэндлер """
 
     dp.register_message_handler(
-        debug_handler, state=["*"], custom_filters=ChatType.is_private)
+        debug_handler, state=["*"])
