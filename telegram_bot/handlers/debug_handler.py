@@ -3,8 +3,10 @@ from aiogram.types import Message
 from aiogram.dispatcher.storage import FSMContext
 from aiogram.dispatcher.filters import Text
 from keyboards.keyboards import StartMenu
+from decorators.decorators import private_message
 
 
+@private_message
 async def debug_handler(message: Message, state: FSMContext) -> None:
     """ Хэндлер отрабатывает на не зарегистрированные команды """
 

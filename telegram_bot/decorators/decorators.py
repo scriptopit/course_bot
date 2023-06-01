@@ -2,6 +2,7 @@ from aiogram.types import Message
 from config import logger, settings
 from typing import Callable, Any
 from functools import wraps
+from aiogram import types
 
 
 @logger.catch
@@ -17,4 +18,12 @@ def check_super_admin(func: Callable) -> Callable:
             return await func(*args, **kwargs)
         logger.debug(f"{func.__qualname__} User {message.from_user.id} is not superadmin.")
 
+    return wrapper
+
+
+@logger.catch
+def private_message(func):
+    async def wrapper(message: types.Message):
+        if message.chat.type == "private":
+            await func(message)
     return wrapper
