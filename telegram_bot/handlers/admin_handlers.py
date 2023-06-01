@@ -4,7 +4,7 @@ import datetime
 from config import bot, Dispatcher, settings
 from aiogram.dispatcher.storage import FSMContext
 from aiogram.dispatcher.filters import Text
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, ChatType
 from states.states import AdminState
 from classes.api_requests import AdminAPI, UserAPI
 from decorators.decorators import check_super_admin
@@ -363,39 +363,39 @@ def register_admin_handlers(dp: Dispatcher) -> None:
     """ Регистрирует админ-хэндлеры приложения """
 
     dp.register_message_handler(
-        admin_menu, commands=["admin"], state=None)
+        admin_menu, commands=["admin"], state=None, filters=ChatType.is_private)
     dp.register_message_handler(
-        add_channel, Text(equals=AdminButton.add_channel))
+        add_channel, Text(equals=AdminButton.add_channel), filters=ChatType.is_private)
     dp.register_message_handler(
-        get_channel_data, state=AdminState.add_new_channel)
+        get_channel_data, state=AdminState.add_new_channel, filters=ChatType.is_private)
     dp.register_message_handler(
-        response_processing, state=AdminState.processing)
+        response_processing, state=AdminState.processing, filters=ChatType.is_private)
     dp.register_message_handler(
-        insert_chat_tag, state=AdminState.receive_tag)
+        insert_chat_tag, state=AdminState.receive_tag, filters=ChatType.is_private)
     dp.register_message_handler(
-        validate_data, state=AdminState.check_data)
+        validate_data, state=AdminState.check_data, filters=ChatType.is_private)
     dp.register_message_handler(
-        user_free_sub, Text(equals=AdminButton.add_sub), state=None)
+        user_free_sub, Text(equals=AdminButton.add_sub), state=None, filters=ChatType.is_private)
     dp.register_message_handler(
-        info_user_filter, state=AdminState.get_user_info)
+        info_user_filter, state=AdminState.get_user_info, filters=ChatType.is_private)
     dp.register_message_handler(
-        accumulate_data_and_send, state=AdminState.choose_tag_user)
+        accumulate_data_and_send, state=AdminState.choose_tag_user, filters=ChatType.is_private)
     dp.register_message_handler(
-        deactivate_user_handle, Text(equals=AdminButton.take_sub), state=None)
+        deactivate_user_handle, Text(equals=AdminButton.take_sub), state=None, filters=ChatType.is_private)
     dp.register_message_handler(
-        deactivate_sub, state=AdminState.deactivate_user)
+        deactivate_sub, state=AdminState.deactivate_user, filters=ChatType.is_private)
     dp.register_message_handler(
-        get_active_users_handler, Text(equals=AdminButton.active_subs))
+        get_active_users_handler, Text(equals=AdminButton.active_subs), filters=ChatType.is_private)
     dp.register_message_handler(
-        get_service_users, Text(equals=AdminButton.all_users))
+        get_service_users, Text(equals=AdminButton.all_users), filters=ChatType.is_private)
     dp.register_message_handler(
-        add_new_lesson, Text(equals=AdminButton.modify_lesson))
+        add_new_lesson, Text(equals=AdminButton.modify_lesson), filters=ChatType.is_private)
     dp.register_message_handler(
-        module_info, state=AdminState.get_module_links)
+        module_info, state=AdminState.get_module_links, filters=ChatType.is_private)
     dp.register_callback_query_handler(
-        callback_module_update, state=AdminState.add_lesson)
+        callback_module_update, state=AdminState.add_lesson, filters=ChatType.is_private)
     dp.register_message_handler(
-        add_level, Text(equals=AdminButton.add_level_button))
+        add_level, Text(equals=AdminButton.add_level_button), filters=ChatType.is_private)
     dp.register_message_handler(
-        rating_user, state=AdminState.issue_credit)
+        rating_user, state=AdminState.issue_credit, filters=ChatType.is_private)
 
