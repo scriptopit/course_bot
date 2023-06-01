@@ -13,8 +13,10 @@ from classes.api_requests import UserAPI, AdminAPI
 from utils.utils import write_to_storage, developer_photo
 from api.utils_schemas import DataStructure
 from messages.main_message import *
+from decorators.decorators import private_message
 
 
+@private_message
 async def main_menu(message: Message) -> None:
     await UserAPI.create_user(
         telegram_id=message.from_user.id, nick_name=message.from_user.username)
@@ -24,7 +26,7 @@ async def main_menu(message: Message) -> None:
         reply_markup=StartMenu.keyboard()
     )
 
-
+@private_message
 async def buy_subscription_packet(message: Message, state: FSMContext) -> None:
     """ Хэндлер для покупки подписки """
 
@@ -41,6 +43,7 @@ async def buy_subscription_packet(message: Message, state: FSMContext) -> None:
     await SubscriptionState.choose_sub_packet.set()
 
 
+@private_message
 async def choose_sub_packet(message: Message, state: FSMContext) -> None:
     """ Хэндлер на название тарифа для оплаты подписки """
 
@@ -98,6 +101,7 @@ async def choose_sub_packet(message: Message, state: FSMContext) -> None:
         await state.finish()
 
 
+@private_message
 async def payment_callback(callback: CallbackQuery, state: FSMContext) -> None:
     """ Ловит callback check_payment и отвечает на него """
 
@@ -157,6 +161,7 @@ async def payment_callback(callback: CallbackQuery, state: FSMContext) -> None:
     await callback.answer()
 
 
+@private_message
 async def cancel_handler(message: Message, state: FSMContext) -> None:
     current_state = await state.get_state()
     await message.reply(
@@ -166,6 +171,7 @@ async def cancel_handler(message: Message, state: FSMContext) -> None:
     await state.finish()
 
 
+@private_message
 async def callback_cancel(callback: CallbackQuery, state: FSMContext) -> None:
     """ Отвечает на CALLBACK кнопки CANCEL """
 
@@ -181,6 +187,7 @@ async def callback_cancel(callback: CallbackQuery, state: FSMContext) -> None:
     await callback.answer()
 
 
+@private_message
 async def info_about(message: Message) -> None:
     """ Возвращает информацию про администрацию ментор-сервиса """
 
@@ -196,6 +203,7 @@ async def info_about(message: Message) -> None:
     )
 
 
+@private_message
 async def support_menu(message: Message) -> None:
     """ Хэндлер для ответа на кнопку 'поддержка' """
 
@@ -207,6 +215,7 @@ async def support_menu(message: Message) -> None:
     await TicketStates.open_ticket.set()
 
 
+@private_message
 async def ticket_create_helper(message: Message, state: FSMContext) -> None:
     """
     Обрабатывает нажатие на кнопку для создание тиккета в стэйте
@@ -231,6 +240,7 @@ async def ticket_create_helper(message: Message, state: FSMContext) -> None:
         )
 
 
+@private_message
 async def get_ticket_data_from_user(message: Message, state: FSMContext) -> None:
     """
     Забирает сообщение тикета у пользователя и проходит дополнительную проверку на правильность введенного запроса
@@ -271,6 +281,7 @@ async def get_ticket_data_from_user(message: Message, state: FSMContext) -> None
         await state.finish()
 
 
+@private_message
 async def accept_ticket_or_decline(message: Message, state: FSMContext) -> None:
     """
     Обрабатывает колбэки при отправке или отмене создания нового тикета
@@ -309,6 +320,7 @@ async def accept_ticket_or_decline(message: Message, state: FSMContext) -> None:
     await state.finish()
 
 
+@private_message
 async def knowledge_menu(message: Message) -> None:
     """ Меню ученика с активной подпиской """
 
@@ -328,6 +340,7 @@ async def knowledge_menu(message: Message) -> None:
         )
 
 
+@private_message
 async def my_academy_stats(message: Message) -> None:
     """ Выводит пользователю статистику по его обучению """
 
@@ -340,6 +353,7 @@ async def my_academy_stats(message: Message) -> None:
     )
 
 
+@private_message
 async def homework_menu(message: Message) -> None:
     """ Меню сдачи домашней работы """
 
@@ -350,6 +364,7 @@ async def homework_menu(message: Message) -> None:
     )
 
 
+@private_message
 async def get_next_lesson(message: Message) -> None:
     """ Отрабатывает для выдачи пользователю нового учебного материала """
 

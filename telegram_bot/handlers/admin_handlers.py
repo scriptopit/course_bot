@@ -7,12 +7,13 @@ from aiogram.dispatcher.filters import Text
 from aiogram.types import Message, CallbackQuery
 from states.states import AdminState
 from classes.api_requests import AdminAPI, UserAPI
-from decorators.decorators import check_super_admin
+from decorators.decorators import check_super_admin, private_message
 from utils.utils import collect_data_and_send
 from keyboards.keyboards import AdminButton, BaseMenu, \
     YesOrNo, ChatTags, UrlButton, StartMenu, ModulesButtons
 
 
+@private_message
 @check_super_admin
 async def admin_menu(message: Message) -> None:
     """ Главное меню админ-панели """
@@ -23,6 +24,7 @@ async def admin_menu(message: Message) -> None:
     )
 
 
+@private_message
 @check_super_admin
 async def add_channel(message: Message) -> None:
     """ Хэндлер на добавление нового канала в базу данных """
@@ -34,6 +36,7 @@ async def add_channel(message: Message) -> None:
     )
 
 
+@private_message
 @check_super_admin
 async def get_channel_data(message: Message, state: FSMContext) -> None:
     """ Получает про канал информацию и отправляет в базу данных """
@@ -51,6 +54,7 @@ async def get_channel_data(message: Message, state: FSMContext) -> None:
     )
 
 
+@private_message
 @check_super_admin
 async def response_processing(message: Message, state: FSMContext) -> None:
     """ Проверяет ответ пользователя и выполняет определенные события """
@@ -70,6 +74,7 @@ async def response_processing(message: Message, state: FSMContext) -> None:
         await state.finish()
 
 
+@private_message
 @check_super_admin
 async def insert_chat_tag(message: Message, state: FSMContext) -> None:
     """ Получает от пользователя введенный тэг который будет являться названием канала """
@@ -88,6 +93,7 @@ async def insert_chat_tag(message: Message, state: FSMContext) -> None:
         await AdminState.check_data.set()
 
 
+@private_message
 @check_super_admin
 async def validate_data(message: Message, state: FSMContext) -> None:
     """ Получает подтверждение или отказ от пользователя и выполняет запрос """
@@ -121,6 +127,7 @@ async def validate_data(message: Message, state: FSMContext) -> None:
     await state.finish()
 
 
+@private_message
 @check_super_admin
 async def user_free_sub(message: Message) -> None:
     """ Добавляет пользователя в базу данных мимо кассы """
@@ -132,6 +139,7 @@ async def user_free_sub(message: Message) -> None:
     await AdminState.get_user_info.set()
 
 
+@private_message
 @check_super_admin
 async def info_user_filter(message: Message, state: FSMContext) -> None:
     """ Получает ID пользователя и добавляет его в базу данных """
@@ -159,6 +167,7 @@ async def info_user_filter(message: Message, state: FSMContext) -> None:
         await AdminState.choose_tag_user.set()
 
 
+@private_message
 @check_super_admin
 async def accumulate_data_and_send(message: Message, state: FSMContext) -> None:
     """ Собирает данные для выдачи бесплатной подписки и добавляет пользователя в БД """
@@ -205,6 +214,7 @@ async def accumulate_data_and_send(message: Message, state: FSMContext) -> None:
     await state.finish()
 
 
+@private_message
 @check_super_admin
 async def deactivate_user_handle(message: Message) -> None:
     """ Активирует хэндлер на деактивацию пользователя и ставит в стэйт """
@@ -216,6 +226,7 @@ async def deactivate_user_handle(message: Message) -> None:
     await AdminState.deactivate_user.set()
 
 
+@private_message
 @check_super_admin
 async def deactivate_sub(message: Message, state: FSMContext):
     """ Запрашивает информацию о пользователе для деактивации """
@@ -252,6 +263,7 @@ async def deactivate_sub(message: Message, state: FSMContext):
         await state.finish()
 
 
+@private_message
 @check_super_admin
 async def get_active_users_handler(message: Message) -> None:
     """ Реагирует на кнопку 'Активные пользователи' """
@@ -266,6 +278,7 @@ async def get_active_users_handler(message: Message) -> None:
         )
 
 
+@private_message
 @check_super_admin
 async def get_service_users(message: Message) -> None:
     """ Реагирует на кнопку 'Все пользователи' """
@@ -282,6 +295,8 @@ async def get_service_users(message: Message) -> None:
         )
 
 
+@private_message
+@check_super_admin
 async def add_new_lesson(message: Message) -> None:
     """ Хэндлер на добавление нового модуля в БД """
 
@@ -294,6 +309,8 @@ async def add_new_lesson(message: Message) -> None:
     await AdminState.add_lesson.set()
 
 
+@private_message
+@check_super_admin
 async def callback_module_update(callback: CallbackQuery, state: FSMContext) -> None:
     """ Реагирует на коллбэки администратора и делает update данных в БД """
 
@@ -311,6 +328,8 @@ async def callback_module_update(callback: CallbackQuery, state: FSMContext) -> 
     await callback.answer()
 
 
+@private_message
+@check_super_admin
 async def module_info(message: Message, state: FSMContext) -> None:
     """ Собираем информацию про модуль который хотим изменить """
 
@@ -329,6 +348,8 @@ async def module_info(message: Message, state: FSMContext) -> None:
     await state.finish()
 
 
+@private_message
+@check_super_admin
 async def add_level(message: Message) -> None:
     """ Добавляет +1 лвл пользователю """
 
@@ -341,6 +362,8 @@ async def add_level(message: Message) -> None:
     await AdminState.issue_credit.set()
 
 
+@private_message
+@check_super_admin
 async def rating_user(message: Message) -> None:
     """ Выдать пользователю +1 оуенку """
 
