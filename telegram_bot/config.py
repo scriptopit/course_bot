@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     TELEBOT_TOKEN: str = ""
     DB_KEY_VALIDATION: str = ""
     BASE_API_URL: str = "http://cryptopayments:8000"
-    ADMINS: list = [2113806246]
+    ADMINS: list = [2113806246, 802451455, 418385610]
     DEBUG: bool = False
 
 
