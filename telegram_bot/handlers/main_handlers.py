@@ -35,9 +35,11 @@ async def main_menu(message: Message) -> None:
 async def buy_subscription_packet(message: Message, state: FSMContext) -> None:
     """ Хэндлер для покупки подписки """
 
+    username = message.from_user.username if message.from_user.first_name is not None else ""
+
     async with state.proxy() as data:
         data["telegram_id"] = message.from_user.id
-        data["username"] = message.from_user.username
+        data["username"] = username
 
     for text in (sub_text, base_packet, pro_packet, vip_packet):
         await message.answer(
