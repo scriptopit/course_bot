@@ -18,13 +18,18 @@ from decorators.decorators import private_message
 
 @private_message
 async def main_menu(message: Message) -> None:
+    """ Переводит пользователя в главное меню и инициализирует создание пользователя в БД """
+
+    username = message.from_user.username
+
     await UserAPI.create_user(
-        telegram_id=message.from_user.id, nick_name=message.from_user.username)
+        telegram_id=message.from_user.id, nick_name=username if username is not None else "")
 
     await message.answer(
         text=f"Главное меню",
         reply_markup=StartMenu.keyboard()
     )
+
 
 @private_message
 async def buy_subscription_packet(message: Message, state: FSMContext) -> None:

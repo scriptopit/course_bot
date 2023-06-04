@@ -3,6 +3,7 @@ from config import logger, BASE_API_URL
 from api.request_classes import PostRequest, GetRequest
 from api.utils_schemas import DataStructure
 from typing import Union
+from api.utils_schemas import UserModel
 
 
 class API:
@@ -217,7 +218,7 @@ class AdminAPI(API):
         """ Получает список всех пользователей из базы данных """
 
         endpoint: str = cls.__URL + '/get_user_list'
-        result: 'DataStructure' = await cls._get_request(endpoint=endpoint)
+        result: list[UserModel] = await cls._get_request(endpoint=endpoint)
 
         return result
 

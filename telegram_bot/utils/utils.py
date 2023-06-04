@@ -3,6 +3,7 @@ import datetime
 from aiogram.dispatcher.storage import FSMContext
 from aiogram.types import Message
 from keyboards.keyboards import AdminButton
+from typing import Union
 
 
 async def write_to_storage(state, url, packet, tag) -> None:
@@ -46,3 +47,9 @@ async def developer_photo():
 
     photo = open('img/img.png', 'rb')
     return photo
+
+
+async def gen_sorted_list(user_list: list) -> Union[list]:
+    """ Итерируясь по списку сортируем новый список из USER MODEL """
+
+    return [user.telegram_id for user in user_list]
