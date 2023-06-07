@@ -338,6 +338,7 @@ async def module_info(message: Message, state: FSMContext) -> None:
 
     data_state = await state.get_data()
     success_update = await AdminAPI.add_module(module_id=data_state['module_id'], links=links)
+    loguru.logger.info(f"MY UPDATE: {success_update}")
 
     if success_update["result"]:
         await message.answer(
