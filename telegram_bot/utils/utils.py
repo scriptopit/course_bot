@@ -1,5 +1,6 @@
 import datetime
 
+import loguru
 from aiogram.dispatcher.storage import FSMContext
 from aiogram.types import Message
 from keyboards.keyboards import AdminButton
@@ -51,5 +52,5 @@ async def developer_photo():
 
 async def gen_sorted_list(user_list: list) -> Union[list]:
     """ Итерируясь по списку сортируем новый список из USER MODEL """
-
+    loguru.logger.info(f"{user_list}")
     return [user.telegram_id for user in user_list]

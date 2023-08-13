@@ -32,7 +32,7 @@ db = Database(
 )
 
 settings = Settings(_env_file='.env', _env_file_encoding='utf-8')
-crypto = AioCryptoPay(token=settings.CRYPTO_PAY_KEY, network=Networks.MAIN_NET)
+crypto = AioCryptoPay(token=settings.CRYPTO_PAY_KEY, network=Networks.TEST_NET)
 
 DATABASE_CONFIG = {
     "connections": {"default": db.get_db_name()},

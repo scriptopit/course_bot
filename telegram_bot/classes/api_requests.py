@@ -192,6 +192,18 @@ class AdminAPI(API):
 
     @classmethod
     @logger.catch
+    async def take_rating(cls, telegram_id: int):
+        """ Добавить +1 рэйтинг пользователю """
+
+        endpoint: str = cls.__URL + "/take_rating"
+        data = {
+            "telegram_id": telegram_id
+        }
+        result: 'DataStructure' = await cls._post_request(endpoint=endpoint, data=data)
+        return result.data
+
+    @classmethod
+    @logger.catch
     async def deactivate_user(cls: 'AdminAPI', telegram_id: int) -> Union[dict, str]:
         """ Деактивировать пользователя """
 

@@ -338,7 +338,6 @@ async def module_info(message: Message, state: FSMContext) -> None:
 
     data_state = await state.get_data()
     success_update = await AdminAPI.add_module(module_id=data_state['module_id'], links=links)
-    loguru.logger.info(f"MY UPDATE: {success_update}")
 
     if success_update["result"]:
         await message.answer(
@@ -364,7 +363,7 @@ async def add_level(message: Message) -> None:
 
 @private_message
 @check_super_admin
-async def rating_user(message: Message) -> None:
+async def rating_user(message: Message, state: FSMContext) -> None:
     """ Выдать пользователю +1 оуенку """
 
     result = await AdminAPI.add_rating(telegram_id=message.text)
@@ -380,6 +379,42 @@ async def rating_user(message: Message) -> None:
         await message.answer(
             text=f"Пользователь {message.text} получил зачет по модулю {result['result'] - 1}"
         )
+    await state.finish()
+
+
+@private_message
+@check_super_admin
+async def take_level(message: Message) -> None:
+    """ Добавляет +1 лвл пользователю """
+
+    await message.answer(
+        text=f"Пришлите сюда ID пользователя кому хотите выдать откат\n"
+             f"Посмотреть можно его в меню 'Активные пользователи'",
+        reply_markup=BaseMenu.keyboard()
+    )
+
+    await AdminState.take_credit.set()
+
+
+@private_message
+@check_super_admin
+async def take_rating_user(message: Message, state: FSMContext) -> None:
+    """ Выдать пользователю -1 оуенку """
+
+    result = await AdminAPI.take_rating(telegram_id=message.text)
+
+    if result["result"]:
+        await bot.send_message(
+            text=f"🌟 Вы получили откат по домашнему заданию.\n"
+                 f"Вам вернули доступ к модулю: {result['result']}",
+            chat_id=message.text,
+            reply_markup=StartMenu.keyboard()
+        )
+
+        await message.answer(
+            text=f"Пользователь {message.text} получил откат по модулю {result['result'] - 1}"
+        )
+    await state.finish()
 
 
 def register_admin_handlers(dp: Dispatcher) -> None:
@@ -420,5 +455,9 @@ def register_admin_handlers(dp: Dispatcher) -> None:
     dp.register_message_handler(
         add_level, Text(equals=AdminButton.add_level_button))
     dp.register_message_handler(
+        take_level, Text(equals=AdminButton.take_lesson))
+    dp.register_message_handler(
         rating_user, state=AdminState.issue_credit)
+    dp.register_message_handler(
+        take_rating_user, state=AdminState.take_credit)
 
