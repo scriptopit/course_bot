@@ -207,7 +207,7 @@ class StrToParam(BaseMenu):
 
     @classmethod
     @logger.catch
-    def keyboard(cls) -> ReplyKeyboardMarkup[KeyboardButton]:
+    def keyboard(cls) -> ReplyKeyboardMarkup:
         """ Возвращает объект ReplyKeyboardMarkup """
 
         return default_keyboard().add(
