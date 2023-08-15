@@ -63,7 +63,7 @@ async def choose_sub_packet(message: Message, state: FSMContext) -> None:
 
         link = await UserAPI.buy_subscription(
             packet="base", telegram_id=message.from_user.id,
-            username=data['username'], price=39)
+            username=data['username'], price=99)
         await write_to_storage(
             state=state, url=link, packet=base_packet_price_menu, tag="base")
 
