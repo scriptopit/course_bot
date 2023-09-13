@@ -111,8 +111,7 @@ async def get_updates_ticket() -> None:
     logger.info(f'start get_updates_ticket: {datetime.datetime.utcnow()}')
     data = await get_helper_channel_data(HELPERS_CHAT)
     logger.info(f"В функцию get_updates_ticket получил список: {data}")
-    ticket = data[0]
-    answer = data[1]
+    ticket, answer = data
 
     if ticket and answer:
         user_id = ticket.split(" | ")[1]
@@ -123,8 +122,8 @@ async def get_updates_ticket() -> None:
 
 
 async def check_base():
-    aioschedule.every(KICK_RATE).minutes.do(kick_hackers)
-    aioschedule.every(HELP_RATE).minutes.do(get_updates_ticket)
+    # aioschedule.every(KICK_RATE).minutes.do(kick_hackers)
+    # aioschedule.every(HELP_RATE).minutes.do(get_updates_ticket)
     # aioschedule.every().day.at("9:00").do(mailing_to_members)
     while True:
         await aioschedule.run_pending()

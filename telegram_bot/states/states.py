@@ -16,9 +16,14 @@ class AdminState(StatesGroup):
     add_lesson = State()
     get_module_links = State()
     issue_credit = State()
+    take_credit = State()
 
 
 class TicketStates(StatesGroup):
     open_ticket = State()
     input_ticket_info = State()
     accept_ticket = State()
+
+
+class HomeWork(StatesGroup):
+    homework_link = State()

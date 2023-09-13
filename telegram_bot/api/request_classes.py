@@ -69,7 +69,6 @@ class RequestSender(ABC):
             logger.error(text)
 
         status = answer.get("status")
-        logger.success(f"{answer}")
 
         if status == 204:
             return DataStructure(status=status, data={}, message="No content")

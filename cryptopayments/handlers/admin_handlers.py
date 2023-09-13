@@ -138,6 +138,22 @@ async def add_rating(user: UserTelegramId, request: Request):
     return {"result": result}
 
 
+@admin_router.post("/take_rating", tags=['admin'])
+async def take_rating(user: UserTelegramId, request: Request):
+    await check_token(request)
+
+    current_rating = await User.get_or_none(telegram_id=user.telegram_id)
+    if not current_rating:
+        return {}
+
+    current_module = int(current_rating.module_level) - 1
+    result = await User.filter(telegram_id=user.telegram_id).update(module_level=current_module)
+
+    if result:
+        return {"result": current_module}
+    return {"result": result}
+
+
 @admin_router.get("/get_channels", response_model=list[ChannelId], tags=['admin'])
 async def get_channels(request: Request):
     await check_token(request)

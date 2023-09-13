@@ -7,7 +7,7 @@ from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from keyboards.keyboards import StartMenu, SubsMenu, \
     PayButton, UrlButton, YesOrNo, BaseMenu, StudentButtons
 from aiogram.dispatcher.filters import Text
-from states.states import SubscriptionState, TicketStates
+from states.states import SubscriptionState, TicketStates, HomeWork
 from aiogram.dispatcher.storage import FSMContext
 from classes.api_requests import UserAPI, AdminAPI
 from utils.utils import write_to_storage, developer_photo
@@ -348,10 +348,7 @@ async def knowledge_menu(message: Message) -> None:
 
 @private_message
 async def my_academy_stats(message: Message) -> None:
-    """ Выводит пользователю статистику по его обучению """
-
     module_id = await UserAPI.get_module_id(telegram_id=message.from_user.id)
-
     await message.answer(
         text=f"🎩 На данный момент вы проходите {module_id} из 30 модулей\n"
              f"💡 Дипломная работа: Не сдана",
@@ -364,10 +361,32 @@ async def homework_menu(message: Message) -> None:
     """ Меню сдачи домашней работы """
 
     await message.answer(
-        text=f"COMING SOON\n\n"
-             f"Сдавай в личные сообщения своему куратору!",
-        reply_markup=StudentButtons.keyboard()
+        text=f"Отправь в этот чат ссылку на домашнее задание в repl.it\n"
+             f"Если вы писали в IDE, загрузите файлы с домашней работой в *GOOGLE/YANDEX* disk\n"
+             f"Не забудьте открыть доступ по ссылке",
+        reply_markup=BaseMenu.keyboard(),
+        disable_web_page_preview=True,
+        parse_mode="Markdown"
     )
+    await HomeWork.homework_link.set()
+
+
+async def send_homework(message: Message, state: FSMContext) -> None:
+    """ Отправляет домашнюю работу куратору на проверку в формате ссылки """
+
+    if "https" in message.text:
+        user_id = message.from_user.id
+        username = message.from_user.username
+
+
+    else:
+        await message.answer(
+            text=f"Вы ввели неверную ссылку на домашнюю работу\n"
+                 f"💡 HINT: Ссылка должна начинаться с *https*",
+            reply_markup=StudentButtons.keyboard(),
+            parse_mode="Markdown"
+        )
+        await state.finish()
 
 
 @private_message
@@ -381,7 +400,8 @@ async def get_next_lesson(message: Message) -> None:
             text=f"🐍 Вот следующий материал для изучения\n"
                  f"По готовности сдайте домашнее задание своему куратору\n\n"
                  f"{links}",
-            reply_markup=StudentButtons.keyboard()
+            reply_markup=StudentButtons.keyboard(),
+            protect_content=True
         )
     else:
         await message.answer(

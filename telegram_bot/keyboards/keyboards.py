@@ -63,6 +63,7 @@ class SubsMenu(BaseMenu):
     base_packet: str = "🎩 Python BASE"
     pro_packet: str = "🎓 Python PRO"
     vip_packet: str = "💎 Python VIP"
+    cancel_button: str = "Отмена"
 
     @classmethod
     @logger.catch
@@ -72,7 +73,8 @@ class SubsMenu(BaseMenu):
         return default_keyboard().add(
             KeyboardButton(cls.base_packet),
             KeyboardButton(cls.pro_packet),
-            KeyboardButton(cls.vip_packet)
+            KeyboardButton(cls.vip_packet),
+            KeyboardButton(cls.cancel_button)
         )
 
 
@@ -103,6 +105,7 @@ class AdminButton(BaseMenu):
     all_users = f"Все пользователи"
     modify_lesson = f"Добавить урок"
     add_level_button = f"Выдать зачет"
+    take_lesson = f"Урок назад"
 
     @classmethod
     @logger.catch
@@ -116,7 +119,8 @@ class AdminButton(BaseMenu):
             KeyboardButton(text=cls.active_subs),
             KeyboardButton(text=cls.all_users),
             KeyboardButton(text=cls.modify_lesson),
-            KeyboardButton(text=cls.add_level_button)
+            KeyboardButton(text=cls.add_level_button),
+            KeyboardButton(text=cls.take_lesson)
         )
 
 
@@ -191,6 +195,24 @@ class StudentButtons(BaseMenu):
             KeyboardButton(text=cls.next_module),
             KeyboardButton(text=cls.submit_homework),
             KeyboardButton(text=cls.my_academy)
+        )
+
+
+@dataclass(frozen=True)
+class StrToParam(BaseMenu):
+    """ Инициализирует строку в параметр класса """
+
+    main_network: str = "Главная сеть"
+    duo_network: str = "Вторичная сеть"
+
+    @classmethod
+    @logger.catch
+    def keyboard(cls) -> ReplyKeyboardMarkup:
+        """ Возвращает объект ReplyKeyboardMarkup """
+
+        return default_keyboard().add(
+            KeyboardButton(text=cls.main_network),
+            KeyboardButton(text=cls.duo_network)
         )
 
 
