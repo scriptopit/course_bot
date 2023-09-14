@@ -18,7 +18,7 @@ services:
       - "work_mem=16MB"
       - "-c"
       - "maintenance_work_mem=512MB"
-    restart: on-failure
+    restart: unless-stopped
     volumes:
       - ./postgres_db/postgres/postgresql-data:/var/lib/postgresql/data
       - ./postgres_db/postgres/pginit/:/docker-entrypoint-initdb.d
