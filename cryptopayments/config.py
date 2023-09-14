@@ -7,7 +7,7 @@ from aiocryptopay import AioCryptoPay, Networks
 class Settings(BaseSettings):
     SERVER_HOST: str = '0.0.0.0'
     SERVER_PORT: int = 8000
-    DEBUG: bool = False
+    DEBUG: bool = True
     ADMINS: list = [2113806246]
     TELEBOT_TOKEN: str
     DB_KEY_VALIDATION: str
