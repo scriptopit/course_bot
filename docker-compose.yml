@@ -42,7 +42,7 @@ services:
       - ./logs:/app/logs
     depends_on:
       - postgres
-    restart: on-failure
+    restart: unless-stopped
 
   cryptopayments:
     container_name: cryptopayments
@@ -56,4 +56,4 @@ services:
       - '8000:8000'
     depends_on:
       - postgres
-    restart: on-failure
+    restart: unless-stopped
